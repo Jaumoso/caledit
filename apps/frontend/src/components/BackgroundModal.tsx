@@ -52,7 +52,7 @@ export default function BackgroundModal({
       onClick={onClose}
     >
       <div className="bg-white rounded-xl shadow-xl w-96 p-5" onClick={(e) => e.stopPropagation()}>
-        <h2 className="font-semibold text-neutral-900 mb-4">Fondo del canvas</h2>
+        <h2 className="font-semibold text-neutral-900 mb-4">Fondo de página</h2>
 
         {/* Solid color */}
         <div className="mb-4">

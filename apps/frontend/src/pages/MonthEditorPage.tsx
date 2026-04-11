@@ -2,7 +2,13 @@ import { useState, useEffect, useCallback, useRef } from 'react'
 import { useParams, useNavigate, Link } from 'react-router-dom'
 import api from '../lib/api'
 import type { GridConfig, DayCell, MonthData, Holiday, CalEvent, Saint } from '../lib/calendarTypes'
-import { DEFAULT_GRID_CONFIG, MONTH_NAMES } from '../lib/calendarTypes'
+import {
+  DEFAULT_GRID_CONFIG,
+  MONTH_NAMES,
+  PAGE_WIDTH,
+  PAGE_HEIGHT,
+  GRID_TOP_PERCENT,
+} from '../lib/calendarTypes'
 import CalendarGrid from '../components/CalendarGrid'
 import GridPropertiesPanel from '../components/GridPropertiesPanel'
 import CellModal from '../components/CellModal'
@@ -298,7 +304,7 @@ export default function MonthEditorPage() {
               : 'bg-neutral-100 text-neutral-600 hover:bg-neutral-200'
           }`}
         >
-          🎨 Imagen superior
+          🎨 Decorar página
         </button>
         <button
           onClick={() => setEditorMode('grid')}
@@ -328,34 +334,48 @@ export default function MonthEditorPage() {
 
       {/* Main editor area */}
       <div className="flex flex-1 min-h-0">
-        {/* Canvas area */}
+        {/* Page area */}
         <div className="flex-1 overflow-auto p-6 bg-neutral-100">
-          <div className="max-w-4xl mx-auto">
-            {/* Canvas top zone */}
-            <div className={editorMode === 'canvas' ? '' : 'pointer-events-none opacity-60'}>
-              <CanvasEditor
-                ref={canvasEditorRef}
-                initialJson={canvasTopJsonRef.current}
-                onModified={handleCanvasModified}
-                onSelectionChange={handleSelectionChange}
-              />
-            </div>
+          <div className="mx-auto" style={{ width: PAGE_WIDTH }}>
+            {/* Unified A4 page container */}
+            <div className="relative shadow-lg" style={{ width: PAGE_WIDTH, height: PAGE_HEIGHT }}>
+              {/* Fabric.js canvas — full page background + art objects */}
+              <div
+                className={`absolute inset-0 ${editorMode === 'canvas' ? '' : 'pointer-events-none'}`}
+                style={{ zIndex: 1 }}
+              >
+                <CanvasEditor
+                  ref={canvasEditorRef}
+                  width={PAGE_WIDTH}
+                  height={PAGE_HEIGHT}
+                  initialJson={canvasTopJsonRef.current}
+                  onModified={handleCanvasModified}
+                  onSelectionChange={handleSelectionChange}
+                />
+              </div>
 
-            {/* Calendar Grid */}
-            <div
-              className={`bg-white rounded-lg shadow-sm p-4 mt-4 ${editorMode === 'grid' ? '' : 'pointer-events-none opacity-80'}`}
-            >
-              <CalendarGrid
-                year={monthData.year}
-                month={monthData.month}
-                weekStartsOn={monthData.project.weekStartsOn}
-                gridConfig={gridConfig}
-                dayCells={dayCells}
-                holidays={holidays}
-                events={events}
-                saints={saints}
-                onCellClick={handleCellClick}
-              />
+              {/* Calendar Grid overlay — positioned in the lower portion */}
+              <div
+                className={`absolute left-0 right-0 px-4 pb-4 ${editorMode === 'grid' ? '' : 'pointer-events-none'}`}
+                style={{
+                  top: `${GRID_TOP_PERCENT}%`,
+                  bottom: 0,
+                  zIndex: editorMode === 'grid' ? 10 : 2,
+                  opacity: gridConfig.gridOverlayOpacity / 100,
+                }}
+              >
+                <CalendarGrid
+                  year={monthData.year}
+                  month={monthData.month}
+                  weekStartsOn={monthData.project.weekStartsOn}
+                  gridConfig={gridConfig}
+                  dayCells={dayCells}
+                  holidays={holidays}
+                  events={events}
+                  saints={saints}
+                  onCellClick={handleCellClick}
+                />
+              </div>
             </div>
           </div>
         </div>

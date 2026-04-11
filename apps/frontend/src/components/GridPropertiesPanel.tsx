@@ -35,7 +35,7 @@ export default function GridPropertiesPanel({ config, onChange }: Props) {
         <h4 className="text-xs font-medium text-neutral-600 mb-2">Fondo de tabla</h4>
         <ColorPicker label="Color" color={config.bgColor} onChange={(c) => update('bgColor', c)} />
         <div className="mt-2">
-          <label className="text-xs text-neutral-500">Opacidad: {config.bgOpacity}%</label>
+          <label className="text-xs text-neutral-500">Opacidad fondo: {config.bgOpacity}%</label>
           <input
             type="range"
             min={0}
@@ -44,6 +44,22 @@ export default function GridPropertiesPanel({ config, onChange }: Props) {
             onChange={(e) => update('bgOpacity', Number(e.target.value))}
             className="w-full accent-primary-500"
           />
+        </div>
+        <div className="mt-2">
+          <label className="text-xs text-neutral-500">
+            Opacidad general del grid: {config.gridOverlayOpacity}%
+          </label>
+          <input
+            type="range"
+            min={0}
+            max={100}
+            value={config.gridOverlayOpacity}
+            onChange={(e) => update('gridOverlayOpacity', Number(e.target.value))}
+            className="w-full accent-primary-500"
+          />
+          <p className="text-[10px] text-neutral-400 mt-0.5">
+            Controla la transparencia de toda la tabla sobre el fondo de página
+          </p>
         </div>
       </section>
 

@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState, useCallback, forwardRef, useImperativeHandle } from 'react'
 import * as fabric from 'fabric'
+import { PAGE_WIDTH, PAGE_HEIGHT } from '../lib/calendarTypes'
 
 export interface CanvasEditorHandle {
   getCanvas: () => fabric.Canvas | null
@@ -35,8 +36,8 @@ interface CanvasEditorProps {
   onSelectionChange?: (obj: fabric.FabricObject | null) => void
 }
 
-const CANVAS_WIDTH = 800
-const CANVAS_HEIGHT = 450
+const CANVAS_WIDTH = PAGE_WIDTH
+const CANVAS_HEIGHT = PAGE_HEIGHT
 
 const MAX_HISTORY = 50
 
@@ -409,10 +410,7 @@ const CanvasEditor = forwardRef<CanvasEditorHandle, CanvasEditorProps>(
     )
 
     return (
-      <div
-        className="canvas-editor-wrapper overflow-auto border border-neutral-300 rounded-lg bg-neutral-200 flex items-center justify-center"
-        style={{ minHeight: height + 40 }}
-      >
+      <div className="canvas-editor-wrapper" style={{ width, height }}>
         <div ref={wrapperRef} />
       </div>
     )

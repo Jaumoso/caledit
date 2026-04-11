@@ -1,6 +1,7 @@
 export interface GridConfig {
   bgColor: string
   bgOpacity: number
+  gridOverlayOpacity: number // overall grid overlay opacity (0-100) so background shows through
   borderColor: string
   borderWidth: number
   borderStyle: 'solid' | 'dashed' | 'dotted' | 'none'
@@ -19,6 +20,13 @@ export interface GridConfig {
   showSaints: boolean
   showEvents: boolean
 }
+
+// A4 page dimensions at 96 DPI (210mm × 297mm)
+export const PAGE_WIDTH = 794
+export const PAGE_HEIGHT = 1123
+
+// Default split: grid occupies bottom ~42%
+export const GRID_TOP_PERCENT = 58
 
 export type DayPosition =
   | 'top-left'
@@ -97,6 +105,7 @@ export interface Saint {
 export const DEFAULT_GRID_CONFIG: GridConfig = {
   bgColor: '#FFFFFF',
   bgOpacity: 100,
+  gridOverlayOpacity: 90,
   borderColor: '#E2DDD6',
   borderWidth: 1,
   borderStyle: 'solid',
