@@ -1,0 +1,47 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: calendapp
+      POSTGRES_USER: calendapp
+      POSTGRES_PASSWORD: calendapp_password
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U calendapp"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.backend
+    environment:
+      - DATABASE_URL=postgresql://calendapp:calendapp_password@postgres:5432/calendapp?schema=public
+      - NODE_ENV=production
+      - COOKIE_SECRET=${COOKIE_SECRET:-default-secret-change-in-production}
+      - JWT_SECRET=${JWT_SECRET:-default-jwt-secret-change-in-production}
+      - UPLOAD_PATH=/data/uploads
+      - EXPORT_PATH=/data/exports
+    volumes:
+      - ./data:/data
+    ports:
+      - "3000:3000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
+
+  puppeteer:
+    build:
+      context: .
+      dockerfile: docker/puppeteer/Dockerfile
+    ports:
+      - "9222:9222"
+    restart: unless-stopped
+
+volumes:
+  postgres_data:

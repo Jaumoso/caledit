@@ -1,0 +1,15 @@
+{
+  "auth": {
+    "signIn": "Sign in",
+    "signInToAccount": "Sign in to your account",
+    "email": "Email",
+    "password": "Password",
+    "rememberMe": "Remember me",
+    "signingIn": "Signing in...",
+    "emailRequired": "Email is required",
+    "passwordRequired": "Password is required",
+    "passwordMinLength": "Password must be at least 6 characters",
+    "invalidEmail": "Invalid email",
+    "demoCredentials": "Demo credentials:"
+  }
+}

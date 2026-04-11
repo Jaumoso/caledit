@@ -1,0 +1,276 @@
+# ROADMAP.md — Plan de desarrollo
+## CalendApp
+
+**Versión:** 1.0  
+**Fecha:** Abril 2026
+
+---
+
+## Filosofía de desarrollo
+
+- **MVP primero:** Construir lo mínimo que permita a tu madre crear y exportar un calendario completo, aunque con menos opciones de personalización. Añadir funcionalidades iterativamente.
+- **Vertical slices:** Cada fase entrega valor real y usable, no capas horizontales de tecnología.
+- **Feedback continuo:** El usuario principal (tu madre) prueba en cuanto hay algo funcional.
+
+---
+
+## Fases de desarrollo
+
+---
+
+## Fase 0 — Setup e infraestructura
+**Duración estimada:** 1-2 días  
+**Objetivo:** Tener el esqueleto funcionando en el servidor.
+
+### Tareas:
+- [ ] Inicializar monorepo con pnpm workspaces
+- [ ] Configurar TypeScript en frontend (Vite + React) y backend (Fastify)
+- [ ] Configurar Tailwind CSS y shadcn/ui
+- [ ] Configurar Prisma + schema inicial de base de datos
+- [ ] Crear docker-compose.yml (nginx, frontend, backend, postgres)
+- [ ] Crear docker-compose.dev.yml (con hot reload)
+- [ ] Configurar ESLint + Prettier
+- [ ] Deploy del esqueleto vacío en el servidor Ubuntu
+- [ ] Verificar que nginx sirve el frontend y proxea `/api/*` al backend
+- [ ] Crear paquete `shared/` con tipos TypeScript base
+
+**Entregable:** `https://calendapp.tuservidor.com` muestra "Hola mundo" en producción.
+
+---
+
+## Fase 1 — Autenticación y gestión de usuarios
+**Duración estimada:** 2-3 días  
+**Objetivo:** Login funcional, dos usuarios (madre + admin).
+
+### Tareas:
+- [ ] Schema Prisma: tabla `users`
+- [ ] Backend: POST `/auth/login`, POST `/auth/logout`, POST `/auth/refresh`, GET `/auth/me`
+- [ ] Backend: middleware de autenticación JWT
+- [ ] Backend: CRUD básico de usuarios (solo admin)
+- [ ] Frontend: pantalla de Login con i18next (ES/EN)
+- [ ] Frontend: authStore (Zustand)
+- [ ] Frontend: rutas protegidas (redirect a login si no autenticado)
+- [ ] Frontend: página de admin → gestión de usuarios
+- [ ] Crear los dos usuarios iniciales (seed)
+
+**Entregable:** Login y logout funcionando. La madre puede entrar con su cuenta.
+
+---
+
+## Fase 2 — Gestión de proyectos (Dashboard)
+**Duración estimada:** 2-3 días  
+**Objetivo:** Crear, listar y organizar proyectos de calendario.
+
+### Tareas:
+- [ ] Schema Prisma: tablas `projects`, `calendar_months`
+- [ ] Backend: CRUD de proyectos (`/projects`)
+- [ ] Backend: al crear proyecto, generar automáticamente 12 registros `calendar_months`
+- [ ] Backend: duplicar proyecto
+- [ ] Frontend: Dashboard con tarjetas de proyectos
+- [ ] Frontend: modal "Nuevo proyecto"
+- [ ] Frontend: Vista general de proyecto (12 meses en grid)
+- [ ] Frontend: estado visual de cada mes (vacío/con contenido/personalizado)
+
+**Entregable:** Se pueden crear y organizar proyectos. La vista de 12 meses es navegable.
+
+---
+
+## Fase 3 — Biblioteca de assets
+**Duración estimada:** 3-4 días  
+**Objetivo:** Subir imágenes y stickers que persisten en el servidor.
+
+### Tareas:
+- [ ] Schema Prisma: tablas `assets`, `asset_folders`
+- [ ] Backend: subida de archivos con validación (MIME, tamaño)
+- [ ] Backend: procesamiento con Sharp (miniaturas, optimización)
+- [ ] Backend: CRUD de carpetas y assets
+- [ ] Backend: Nginx configurado para servir `/uploads/` directamente
+- [ ] Frontend: página de Biblioteca (grid de imágenes, árbol de carpetas)
+- [ ] Frontend: subida drag & drop con barra de progreso
+- [ ] Frontend: búsqueda y filtrado
+
+**Entregable:** La madre puede subir todas sus fotos una vez y acceder a ellas siempre.
+
+---
+
+## Fase 4 — Editor de mes: zona inferior (Grid)
+**Duración estimada:** 5-7 días  
+**Objetivo:** El grid del calendario es editable visualmente.
+
+### Tareas:
+- [ ] Schema Prisma: actualizar `calendar_months` con `gridConfigJson`, `dayCells`
+- [ ] Backend: GET/PUT del mes (cargar y guardar estado)
+- [ ] Frontend: MonthEditorPage con layout básico (zonas superior/inferior)
+- [ ] Frontend: componente CalendarGrid (renderizado del mes correcto con días correctos)
+- [ ] Frontend: lógica de días (Gregoriano, primer día semana configurable)
+- [ ] Frontend: panel de propiedades del Grid (colores, bordes, fuentes)
+- [ ] Frontend: FontSelector con preview de fuentes (Fontsource)
+- [ ] Frontend: ColorPicker (react-colorful)
+- [ ] Frontend: posición del número en la celda (9 posiciones)
+- [ ] Frontend: modal de celda (color fondo, texto básico)
+- [ ] Frontend: auto-save cada 30 segundos
+- [ ] Frontend: botón Guardar manual
+
+**Entregable:** Se puede personalizar el grid del calendario con colores, fuentes y bordes.
+
+---
+
+## Fase 5 — Festivos y eventos
+**Duración estimada:** 3-4 días  
+**Objetivo:** Festivos automáticos y eventos personalizados en el grid.
+
+### Tareas:
+- [ ] Schema Prisma: tablas `holidays`, `events`
+- [ ] Importar base de datos de festivos nacionales ES (2025-2030) y por CCAA
+- [ ] Importar calendario de santos español
+- [ ] Backend: `/holidays`, `/saints`, `/events` (CRUD)
+- [ ] Backend: al cargar un mes, inyectar festivos y eventos en la respuesta
+- [ ] Frontend: página de gestión de eventos personalizados
+- [ ] Frontend: indicación visual de festivos en celdas (color diferente)
+- [ ] Frontend: indicación visual de eventos en celdas (icono + color)
+- [ ] Frontend: selector de CCAA en configuración del proyecto
+- [ ] Frontend: mostrar santo del día en celda (activable/desactivable)
+- [ ] Frontend: modal de celda ampliado → ver y añadir eventos del día
+
+**Entregable:** Los festivos aparecen automáticamente. Cumpleaños y aniversarios se pueden añadir.
+
+---
+
+## Fase 6 — Editor de mes: zona superior (Canvas Fabric.js)
+**Duración estimada:** 7-10 días  
+**Objetivo:** Editor visual completo para la zona de imagen/collage.
+
+### Tareas:
+- [ ] Integrar Fabric.js en la zona superior del editor
+- [ ] Cargar/guardar estado del canvas (JSON) en el backend
+- [ ] Herramienta: selección y movimiento de elementos
+- [ ] Herramienta: añadir imagen desde biblioteca → objeto Fabric.js posicionable
+- [ ] Herramienta: control X/Y numérico + arrastre
+- [ ] Herramienta: redimensionar manteniendo proporciones
+- [ ] Herramienta: control de capa Z (traer al frente, enviar al fondo)
+- [ ] Panel de capas (lista de objetos del canvas)
+- [ ] Herramienta: efectos de imagen (opacidad, brillo, contraste, escala de grises, sepia)
+- [ ] Herramienta: añadir texto decorativo libre con control de fuente/tamaño/color
+- [ ] Herramienta: fondo de zona (color, degradado, imagen)
+- [ ] Herramienta: añadir sticker/emoji como objeto del canvas
+- [ ] Deshacer/Rehacer (historial de canvas)
+- [ ] Zoom en el editor
+
+**Entregable:** La zona superior es un editor visual completo. Se pueden hacer collages.
+
+---
+
+## Fase 7 — Celda avanzada (imágenes y stickers en días)
+**Duración estimada:** 3-4 días  
+**Objetivo:** Cada celda del grid puede tener imagen, sticker y texto.
+
+### Tareas:
+- [ ] Modal de celda: seleccionar imagen de biblioteca → se muestra en la celda
+- [ ] Modal de celda: seleccionar sticker/emoji → se muestra en la celda
+- [ ] Panel de Stickers y Emojis (con búsqueda)
+- [ ] Renderizado de celdas con contenido (imagen de fondo + sticker + texto + número)
+- [ ] Posicionamiento relativo dentro de la celda
+
+**Entregable:** Las celdas se pueden decorar individualmente con fotos y stickers.
+
+---
+
+## Fase 8 — Plantillas
+**Duración estimada:** 2-3 días  
+**Objetivo:** Sistema de plantilla base + personalización por mes.
+
+### Tareas:
+- [ ] Schema Prisma: tabla `templates`
+- [ ] Backend: CRUD de plantillas
+- [ ] Frontend: editor de plantilla base del proyecto
+- [ ] Frontend: indicador visual de mes con personalización propia
+- [ ] Frontend: "Aplicar a todos los meses" con confirmación
+- [ ] Frontend: guardar configuración actual como plantilla con nombre
+- [ ] Frontend: seleccionar plantilla al crear proyecto
+
+**Entregable:** Se define una base visual y cada mes puede personalizarse sobre ella.
+
+---
+
+## Fase 9 — Exportación PDF/PNG
+**Duración estimada:** 4-5 días  
+**Objetivo:** Generar archivos de alta calidad listos para imprimir.
+
+### Tareas:
+- [ ] Contenedor Docker para Puppeteer (sin sandbox, usuario no-root)
+- [ ] Ruta interna de renderizado (URL que Puppeteer abre para cada mes)
+- [ ] Backend: cola de trabajos de exportación con estado
+- [ ] Puppeteer: captura PNG a 300 DPI (deviceScaleFactor)
+- [ ] Puppeteer: generación de PDF multipágina A4
+- [ ] Opción de guía de encuadernación (línea central)
+- [ ] Frontend: modal de exportación completo
+- [ ] Frontend: polling de estado + descarga automática
+- [ ] Configuración de nombre de archivo
+
+**Entregable:** Se puede exportar el calendario completo en PDF listo para imprimir.
+
+---
+
+## Fase 10 — Pulido, UX y producción
+**Duración estimada:** 3-4 días  
+**Objetivo:** App lista para uso diario por la madre.
+
+### Tareas:
+- [ ] Onboarding breve (tooltip tour en primer uso)
+- [ ] Tooltips en todas las herramientas del editor
+- [ ] Mensajes de error amigables en toda la app
+- [ ] Optimización de rendimiento (lazy loading de assets, compresión)
+- [ ] Tests de los flujos principales (Playwright)
+- [ ] Documentación de uso básico (guía de usuario en PDF)
+- [ ] Configurar backup automático del volumen de datos
+- [ ] Configurar HTTPS con certificado propio o Let's Encrypt
+- [ ] Revisión completa con el usuario principal (prueba real)
+
+**Entregable:** App en producción, estable y usable por la madre sin ayuda.
+
+---
+
+## Resumen de fases y estimaciones
+
+| Fase | Descripción | Estimación |
+|------|-------------|------------|
+| 0 | Setup e infraestructura | 1-2 días |
+| 1 | Autenticación | 2-3 días |
+| 2 | Gestión de proyectos | 2-3 días |
+| 3 | Biblioteca de assets | 3-4 días |
+| 4 | Editor grid (zona inferior) | 5-7 días |
+| 5 | Festivos y eventos | 3-4 días |
+| 6 | Editor canvas (zona superior) | 7-10 días |
+| 7 | Celdas avanzadas | 3-4 días |
+| 8 | Plantillas | 2-3 días |
+| 9 | Exportación PDF/PNG | 4-5 días |
+| 10 | Pulido y producción | 3-4 días |
+| **Total** | | **~35-49 días** |
+
+> ⚠️ Estas estimaciones son para dedicación a tiempo parcial (no jornada completa). Ajustar según disponibilidad real.
+
+---
+
+## MVP funcional (Fases 0-5 + 9 básico)
+
+Con las fases 0 a 5 más una versión básica de exportación, la madre ya puede:
+- Crear un proyecto de calendario
+- Subir sus fotos
+- Personalizar el grid (colores, fuentes)
+- Ver los festivos automáticamente
+- Añadir cumpleaños y eventos
+- Exportar el PDF para imprimir
+
+La zona de collage (Fase 6) es la más compleja y puede venir después del MVP.
+
+---
+
+## Ideas para v2 (post-MVP)
+
+- Portada y contraportada
+- Vista previa de impresión (simulación física)
+- Copiar/pegar elementos entre meses
+- Guías de alineación (snap)
+- Festivos internacionales
+- Modo oscuro
+- Compartir calendario como enlace de solo lectura

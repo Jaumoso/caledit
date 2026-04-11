@@ -1,0 +1,15 @@
+{
+  "auth": {
+    "signIn": "Iniciar sesión",
+    "signInToAccount": "Inicia sesión en tu cuenta",
+    "email": "Correo electrónico",
+    "password": "Contraseña",
+    "rememberMe": "Recordarme",
+    "signingIn": "Iniciando sesión...",
+    "emailRequired": "El correo electrónico es obligatorio",
+    "passwordRequired": "La contraseña es obligatoria",
+    "passwordMinLength": "La contraseña debe tener al menos 6 caracteres",
+    "invalidEmail": "Correo electrónico inválido",
+    "demoCredentials": "Credenciales de demostración:"
+  }
+}
