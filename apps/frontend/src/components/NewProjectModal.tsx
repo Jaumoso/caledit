@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import api from '../lib/api'
 
 const AUTONOMY_CODES = [
@@ -23,6 +23,12 @@ const AUTONOMY_CODES = [
   { code: 'ML', name: 'Melilla' },
 ]
 
+interface TemplateOption {
+  id: string
+  name: string
+  isDefault: boolean
+}
+
 interface Props {
   onClose: () => void
   onCreate: () => void
@@ -34,8 +40,21 @@ export default function NewProjectModal({ onClose, onCreate }: Props) {
   const [year, setYear] = useState(currentYear + 1)
   const [weekStartsOn, setWeekStartsOn] = useState<'monday' | 'sunday'>('monday')
   const [autonomyCode, setAutonomyCode] = useState('')
+  const [templateId, setTemplateId] = useState('')
+  const [templates, setTemplates] = useState<TemplateOption[]>([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+
+  useEffect(() => {
+    api
+      .get('/templates')
+      .then(({ data }) => {
+        setTemplates(data.templates)
+        const def = data.templates.find((t: TemplateOption) => t.isDefault)
+        if (def) setTemplateId(def.id)
+      })
+      .catch(() => {})
+  }, [])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -50,6 +69,7 @@ export default function NewProjectModal({ onClose, onCreate }: Props) {
         year,
         weekStartsOn,
         autonomyCode: autonomyCode || undefined,
+        templateId: templateId || undefined,
       })
       onCreate()
     } catch {
@@ -143,6 +163,30 @@ export default function NewProjectModal({ onClose, onCreate }: Props) {
               ))}
             </select>
           </div>
+
+          {templates.length > 0 && (
+            <div>
+              <label className="block text-sm font-medium text-neutral-700 mb-1">
+                Plantilla base
+              </label>
+              <select
+                value={templateId}
+                onChange={(e) => setTemplateId(e.target.value)}
+                className="w-full px-3 py-2 border border-neutral-300 rounded-md text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none"
+              >
+                <option value="">Sin plantilla</option>
+                {templates.map((t) => (
+                  <option key={t.id} value={t.id}>
+                    {t.name}
+                    {t.isDefault ? ' ⭐' : ''}
+                  </option>
+                ))}
+              </select>
+              <p className="text-[10px] text-neutral-400 mt-0.5">
+                La plantilla se aplicará a los 12 meses al crear el proyecto
+              </p>
+            </div>
+          )}
 
           {error && <p className="text-sm text-red-600">{error}</p>}
 

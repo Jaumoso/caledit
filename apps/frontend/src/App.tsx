@@ -10,6 +10,7 @@ import ProjectPage from './pages/ProjectPage'
 import LibraryPage from './pages/LibraryPage'
 import MonthEditorPage from './pages/MonthEditorPage'
 import EventsPage from './pages/EventsPage'
+import TemplatesPage from './pages/TemplatesPage'
 import './App.css'
 
 function App() {
@@ -49,6 +50,7 @@ function App() {
         <Route path="/projects/:projectId/months/:monthId" element={<MonthEditorPage />} />
         <Route path="/library" element={<LibraryPage />} />
         <Route path="/events" element={<EventsPage />} />
+        <Route path="/templates" element={<TemplatesPage />} />
         <Route
           path="/admin"
           element={

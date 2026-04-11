@@ -14,6 +14,7 @@ import AssetPickerModal from '../components/AssetPickerModal'
 import StickerPickerModal from '../components/StickerPickerModal'
 import BackgroundModal from '../components/BackgroundModal'
 import DraggableGridOverlay from '../components/DraggableGridOverlay'
+import SaveAsTemplateModal from '../components/SaveAsTemplateModal'
 
 const AUTOSAVE_INTERVAL = 30_000 // 30 seconds
 
@@ -44,6 +45,7 @@ export default function MonthEditorPage() {
   const [showStickerPicker, setShowStickerPicker] = useState(false)
   const [showBackgroundModal, setShowBackgroundModal] = useState(false)
   const [bgAssetMode, setBgAssetMode] = useState(false)
+  const [showSaveTemplate, setShowSaveTemplate] = useState(false)
 
   const dirtyRef = useRef(false)
   const gridConfigRef = useRef(gridConfig)
@@ -307,6 +309,13 @@ export default function MonthEditorPage() {
           >
             {saving ? 'Guardando...' : 'Guardar'}
           </button>
+          <button
+            onClick={() => setShowSaveTemplate(true)}
+            className="btn btn-secondary text-sm"
+            title="Guardar configuración actual como plantilla"
+          >
+            💾 Plantilla
+          </button>
         </div>
       </div>
 
@@ -462,6 +471,15 @@ export default function MonthEditorPage() {
           setShowAssetPicker(true)
         }}
       />
+
+      {/* Save as template modal */}
+      {showSaveTemplate && monthId && (
+        <SaveAsTemplateModal
+          monthId={monthId}
+          onClose={() => setShowSaveTemplate(false)}
+          onSaved={() => setShowSaveTemplate(false)}
+        />
+      )}
     </div>
   )
 }

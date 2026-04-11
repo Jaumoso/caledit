@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useParams, Link, useNavigate } from 'react-router-dom'
 import api from '../lib/api'
+import ApplyTemplateModal from '../components/ApplyTemplateModal'
 
 interface CalendarMonth {
   id: string
@@ -15,6 +16,7 @@ interface Project {
   year: number
   status: 'DRAFT' | 'IN_PROGRESS' | 'COMPLETED'
   weekStartsOn: string
+  templateId: string | null
   months: CalendarMonth[]
 }
 
@@ -60,6 +62,7 @@ export default function ProjectPage() {
   const [project, setProject] = useState<Project | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [showApplyTemplate, setShowApplyTemplate] = useState(false)
 
   useEffect(() => {
     const fetchProject = async () => {
@@ -127,10 +130,20 @@ export default function ProjectPage() {
           </button>
           <div>
             <h1 className="text-2xl font-bold text-neutral-900">{project.name}</h1>
-            <p className="text-sm text-neutral-500">{project.year}</p>
+            <p className="text-sm text-neutral-500">
+              {project.year}
+              {project.templateId && (
+                <span className="ml-2 text-xs bg-primary-50 text-primary-600 px-1.5 py-0.5 rounded">
+                  📋 Con plantilla
+                </span>
+              )}
+            </p>
           </div>
         </div>
         <div className="flex items-center gap-3">
+          <button onClick={() => setShowApplyTemplate(true)} className="btn btn-secondary text-sm">
+            📋 Aplicar plantilla
+          </button>
           <select
             value={project.status}
             onChange={(e) => handleStatusChange(e.target.value)}
@@ -190,6 +203,22 @@ export default function ProjectPage() {
           )
         })}
       </div>
+
+      {/* Apply template modal */}
+      {showApplyTemplate && project && (
+        <ApplyTemplateModal
+          projectId={project.id}
+          onClose={() => setShowApplyTemplate(false)}
+          onApplied={() => {
+            setShowApplyTemplate(false)
+            // Refresh project data
+            api
+              .get(`/projects/${id}`)
+              .then(({ data }) => setProject(data.project))
+              .catch(() => {})
+          }}
+        />
+      )}
     </div>
   )
 }

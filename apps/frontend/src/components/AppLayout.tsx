@@ -9,6 +9,7 @@ export default function AppLayout() {
     { to: '/', label: 'Mis calendarios' },
     { to: '/library', label: 'Biblioteca' },
     { to: '/events', label: 'Eventos' },
+    { to: '/templates', label: 'Plantillas' },
     ...(user?.role === 'ADMIN' ? [{ to: '/admin', label: 'Administración' }] : []),
   ]
 
