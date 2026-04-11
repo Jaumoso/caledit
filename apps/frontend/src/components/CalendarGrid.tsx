@@ -1,4 +1,11 @@
-import type { GridConfig, DayCell, DayPosition } from '../lib/calendarTypes'
+import type {
+  GridConfig,
+  DayCell,
+  DayPosition,
+  Holiday,
+  CalEvent,
+  Saint,
+} from '../lib/calendarTypes'
 import {
   DEFAULT_GRID_CONFIG,
   getDaysInMonth,
@@ -14,6 +21,9 @@ interface Props {
   weekStartsOn: string
   gridConfig: GridConfig
   dayCells: DayCell[]
+  holidays: Holiday[]
+  events: CalEvent[]
+  saints: Saint[]
   onCellClick: (dayNumber: number) => void
 }
 
@@ -35,6 +45,9 @@ export default function CalendarGrid({
   weekStartsOn,
   gridConfig,
   dayCells,
+  holidays,
+  events,
+  saints,
   onCellClick,
 }: Props) {
   const config = { ...DEFAULT_GRID_CONFIG, ...gridConfig }
@@ -42,6 +55,23 @@ export default function CalendarGrid({
   const firstDay = getFirstDayOfWeek(year, month, weekStartsOn)
   const weekdays = weekStartsOn === 'monday' ? WEEKDAY_HEADERS_MON : WEEKDAY_HEADERS_SUN
   const cellMap = new Map(dayCells.map((c) => [c.dayNumber, c]))
+  const holidayMap = new Map<number, Holiday[]>()
+  const eventMap = new Map<number, CalEvent[]>()
+  const saintMap = new Map<number, string>()
+
+  for (const h of holidays) {
+    const arr = holidayMap.get(h.day) || []
+    arr.push(h)
+    holidayMap.set(h.day, arr)
+  }
+  for (const e of events) {
+    const arr = eventMap.get(e.day) || []
+    arr.push(e)
+    eventMap.set(e.day, arr)
+  }
+  for (const s of saints) {
+    saintMap.set(s.day, s.name)
+  }
 
   const totalCells = firstDay + daysInMonth
   const rows = Math.ceil(totalCells / 7)
@@ -91,8 +121,17 @@ export default function CalendarGrid({
             const isValid = dayNumber >= 1 && dayNumber <= daysInMonth
             const weekend = isValid && isWeekend(dayNumber, year, month)
             const cell = isValid ? cellMap.get(dayNumber) : undefined
+            const dayHolidays = isValid ? holidayMap.get(dayNumber) : undefined
+            const dayEvents = isValid ? eventMap.get(dayNumber) : undefined
+            const saint = isValid ? saintMap.get(dayNumber) : undefined
 
-            const cellBg = cell?.bgColor || (weekend ? config.weekendBgColor : undefined)
+            const isHoliday = config.showHolidays && dayHolidays && dayHolidays.length > 0
+            const hasEvents = config.showEvents && dayEvents && dayEvents.length > 0
+
+            const cellBg =
+              cell?.bgColor ||
+              (isHoliday ? config.holidayBgColor : undefined) ||
+              (weekend ? config.weekendBgColor : undefined)
 
             return (
               <div
@@ -113,13 +152,53 @@ export default function CalendarGrid({
                       style={{
                         fontFamily: config.dayFontFamily,
                         fontSize: `${config.dayFontSize}px`,
-                        color: config.dayFontColor,
-                        fontWeight: config.dayFontWeight,
+                        color: isHoliday ? '#DC2626' : config.dayFontColor,
+                        fontWeight: isHoliday ? 'bold' : config.dayFontWeight,
                       }}
                     >
                       {dayNumber}
                     </span>
-                    {cell?.contentJson?.text && (
+
+                    {/* Saint name */}
+                    {config.showSaints && saint && (
+                      <span className="absolute top-0.5 left-0.5 text-[7px] text-neutral-400 leading-tight max-w-[90%] truncate">
+                        {saint}
+                      </span>
+                    )}
+
+                    {/* Holiday label */}
+                    {isHoliday && dayHolidays && (
+                      <span className="absolute bottom-0.5 left-0.5 right-0.5 text-[8px] text-red-600 font-medium truncate leading-tight">
+                        {dayHolidays[0].nameEs}
+                      </span>
+                    )}
+
+                    {/* Events indicators */}
+                    {hasEvents && !isHoliday && dayEvents && (
+                      <span
+                        className="absolute bottom-0.5 left-0.5 right-0.5 text-[8px] truncate leading-tight"
+                        style={{ color: dayEvents[0].color }}
+                      >
+                        {dayEvents[0].icon || '•'} {dayEvents[0].name}
+                      </span>
+                    )}
+
+                    {/* Event dots when holiday takes bottom text */}
+                    {hasEvents && isHoliday && dayEvents && (
+                      <div className="absolute top-0.5 right-0.5 flex gap-0.5">
+                        {dayEvents.slice(0, 3).map((ev) => (
+                          <span
+                            key={ev.id}
+                            className="w-1.5 h-1.5 rounded-full"
+                            style={{ backgroundColor: ev.color }}
+                            title={ev.name}
+                          />
+                        ))}
+                      </div>
+                    )}
+
+                    {/* Cell text (when no holiday/event text shown) */}
+                    {cell?.contentJson?.text && !isHoliday && !hasEvents && (
                       <span className="absolute bottom-0.5 left-0.5 right-0.5 text-[9px] text-neutral-500 truncate leading-tight">
                         {cell.contentJson.text}
                       </span>

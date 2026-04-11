@@ -194,6 +194,47 @@ export default function GridPropertiesPanel({ config, onChange }: Props) {
           />
         </div>
       </section>
+
+      {/* Holidays, events & saints */}
+      <section>
+        <h4 className="text-xs font-medium text-neutral-600 mb-2">Festivos y eventos</h4>
+        <label className="flex items-center gap-2 text-xs text-neutral-700 mb-2">
+          <input
+            type="checkbox"
+            checked={config.showHolidays}
+            onChange={(e) => update('showHolidays', e.target.checked)}
+            className="accent-primary-600"
+          />
+          Mostrar festivos
+        </label>
+        {config.showHolidays && (
+          <div className="mb-2 ml-5">
+            <ColorPicker
+              label="Color festivo"
+              color={config.holidayBgColor}
+              onChange={(c) => update('holidayBgColor', c)}
+            />
+          </div>
+        )}
+        <label className="flex items-center gap-2 text-xs text-neutral-700 mb-2">
+          <input
+            type="checkbox"
+            checked={config.showEvents}
+            onChange={(e) => update('showEvents', e.target.checked)}
+            className="accent-primary-600"
+          />
+          Mostrar eventos
+        </label>
+        <label className="flex items-center gap-2 text-xs text-neutral-700">
+          <input
+            type="checkbox"
+            checked={config.showSaints}
+            onChange={(e) => update('showSaints', e.target.checked)}
+            className="accent-primary-600"
+          />
+          Mostrar santo del día
+        </label>
+      </section>
     </div>
   )
 }

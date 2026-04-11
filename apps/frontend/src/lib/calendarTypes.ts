@@ -14,6 +14,10 @@ export interface GridConfig {
   headerFontSize: number
   headerFontColor: string
   headerBgColor: string
+  showHolidays: boolean
+  holidayBgColor: string
+  showSaints: boolean
+  showEvents: boolean
 }
 
 export type DayPosition =
@@ -56,8 +60,38 @@ export interface MonthData {
     weekStartsOn: string
     name: string
     year: number
+    autonomyCode: string | null
   }
   dayCells: DayCell[]
+}
+
+export interface Holiday {
+  id: string
+  year: number
+  month: number
+  day: number
+  nameEs: string
+  nameEn: string
+  scope: 'NATIONAL' | 'AUTONOMY'
+  autonomyCode: string | null
+}
+
+export interface CalEvent {
+  id: string
+  name: string
+  day: number
+  month: number
+  year: number | null
+  type: 'BIRTHDAY' | 'ANNIVERSARY' | 'SAINT' | 'CUSTOM'
+  color: string
+  icon: string | null
+  isRecurring: boolean
+  userId: string
+}
+
+export interface Saint {
+  day: number
+  name: string
 }
 
 export const DEFAULT_GRID_CONFIG: GridConfig = {
@@ -76,6 +110,10 @@ export const DEFAULT_GRID_CONFIG: GridConfig = {
   headerFontSize: 12,
   headerFontColor: '#6B6560',
   headerBgColor: '#F8F7F4',
+  showHolidays: true,
+  holidayBgColor: '#FECACA',
+  showSaints: false,
+  showEvents: true,
 }
 
 export const MONTH_NAMES = [

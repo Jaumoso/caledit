@@ -1,6 +1,7 @@
 import { FastifyPluginAsync } from 'fastify'
 import { z } from 'zod'
 import { prisma } from '../prisma.js'
+import { getSaintsForMonth } from '../data/saints.js'
 
 const gridConfigSchema = z.object({
   bgColor: z.string().optional(),
@@ -52,14 +53,16 @@ const updateCellSchema = z.object({
 })
 
 const monthRoutes: FastifyPluginAsync = async (fastify) => {
-  // GET /months/:id — Get a single month with day cells
+  // GET /months/:id — Get a single month with day cells, holidays, events, and saints
   fastify.get('/months/:id', { preHandler: fastify.authenticate }, async (request, reply) => {
     const { id } = request.params as { id: string }
 
     const month = await prisma.calendarMonth.findFirst({
       where: { id },
       include: {
-        project: { select: { userId: true, weekStartsOn: true, name: true, year: true } },
+        project: {
+          select: { userId: true, weekStartsOn: true, name: true, year: true, autonomyCode: true },
+        },
         dayCells: { orderBy: { dayNumber: 'asc' } },
       },
     })
@@ -68,7 +71,38 @@ const monthRoutes: FastifyPluginAsync = async (fastify) => {
       return reply.code(404).send({ error: 'NOT_FOUND', message: 'Month not found' })
     }
 
-    reply.send({ month })
+    // Fetch holidays for this month (national + autonomy if project has one)
+    const holidayWhere: Record<string, unknown> = {
+      year: month.year,
+      month: month.month,
+    }
+    if (month.project.autonomyCode) {
+      holidayWhere.OR = [
+        { scope: 'NATIONAL' },
+        { scope: 'AUTONOMY', autonomyCode: month.project.autonomyCode },
+      ]
+    } else {
+      holidayWhere.scope = 'NATIONAL'
+    }
+    const holidays = await prisma.holiday.findMany({
+      where: holidayWhere,
+      orderBy: { day: 'asc' },
+    })
+
+    // Fetch user events for this month
+    const events = await prisma.event.findMany({
+      where: {
+        userId: request.user!.id,
+        month: month.month,
+        OR: [{ isRecurring: true }, { year: month.year }],
+      },
+      orderBy: { day: 'asc' },
+    })
+
+    // Get saints for this month
+    const saints = getSaintsForMonth(month.month)
+
+    reply.send({ month, holidays, events, saints })
   })
 
   // PUT /months/:id — Update month (grid config, canvas JSON, etc.)

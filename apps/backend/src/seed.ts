@@ -1,5 +1,6 @@
 import bcrypt from 'bcrypt'
 import { prisma } from './prisma.js'
+import { generateAllHolidays } from './data/holidays.js'
 
 async function main() {
   console.log('🌱 Seeding database...')
@@ -29,6 +30,20 @@ async function main() {
       role: 'USER',
     },
   })
+
+  // Seed holidays (2025-2030)
+  const existingCount = await prisma.holiday.count()
+  if (existingCount === 0) {
+    console.log('📅 Seeding holidays (2025-2030)...')
+    const holidays = generateAllHolidays(2025, 2030)
+    await prisma.holiday.createMany({
+      data: holidays,
+      skipDuplicates: true,
+    })
+    console.log(`✅ ${holidays.length} holidays seeded`)
+  } else {
+    console.log(`📅 Holidays already seeded (${existingCount} records)`)
+  }
 
   console.log('✅ Database seeded successfully!')
   console.log('Admin user:', admin.email, '(password: admin123)')

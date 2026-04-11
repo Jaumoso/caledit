@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
 import { useParams, useNavigate, Link } from 'react-router-dom'
 import api from '../lib/api'
-import type { GridConfig, DayCell, MonthData } from '../lib/calendarTypes'
+import type { GridConfig, DayCell, MonthData, Holiday, CalEvent, Saint } from '../lib/calendarTypes'
 import { DEFAULT_GRID_CONFIG, MONTH_NAMES } from '../lib/calendarTypes'
 import CalendarGrid from '../components/CalendarGrid'
 import GridPropertiesPanel from '../components/GridPropertiesPanel'
@@ -22,6 +22,9 @@ export default function MonthEditorPage() {
   const [lastSaved, setLastSaved] = useState<Date | null>(null)
   const [dirty, setDirty] = useState(false)
   const [selectedDay, setSelectedDay] = useState<number | null>(null)
+  const [holidays, setHolidays] = useState<Holiday[]>([])
+  const [events, setEvents] = useState<CalEvent[]>([])
+  const [saints, setSaints] = useState<Saint[]>([])
 
   const dirtyRef = useRef(false)
   const gridConfigRef = useRef(gridConfig)
@@ -42,6 +45,9 @@ export default function MonthEditorPage() {
           setGridConfig({ ...DEFAULT_GRID_CONFIG, ...data.month.gridConfigJson })
         }
         setDayCells(data.month.dayCells || [])
+        setHolidays(data.holidays || [])
+        setEvents(data.events || [])
+        setSaints(data.saints || [])
       } catch {
         setError('No se pudo cargar el mes')
       } finally {
@@ -94,6 +100,18 @@ export default function MonthEditorPage() {
   const handleCellClick = (dayNumber: number) => {
     setSelectedDay(dayNumber)
   }
+
+  const refetchEvents = useCallback(async () => {
+    if (!monthData) return
+    try {
+      const { data } = await api.get(`/events`, {
+        params: { month: monthData.month, year: monthData.year },
+      })
+      setEvents(data.events)
+    } catch {
+      // ignore
+    }
+  }, [monthData])
 
   const handleCellSave = async (data: {
     bgColor: string | null
@@ -233,6 +251,9 @@ export default function MonthEditorPage() {
                 weekStartsOn={monthData.project.weekStartsOn}
                 gridConfig={gridConfig}
                 dayCells={dayCells}
+                holidays={holidays}
+                events={events}
+                saints={saints}
                 onCellClick={handleCellClick}
               />
             </div>
@@ -252,7 +273,11 @@ export default function MonthEditorPage() {
           month={monthData.month}
           year={monthData.year}
           cell={selectedCell}
+          holidays={holidays.filter((h) => h.day === selectedDay)}
+          events={events.filter((e) => e.day === selectedDay)}
+          saint={saints.find((s) => s.day === selectedDay)?.name || null}
           onSave={handleCellSave}
+          onEventsChanged={refetchEvents}
           onClose={() => setSelectedDay(null)}
         />
       )}

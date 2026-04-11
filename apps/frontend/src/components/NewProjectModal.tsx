@@ -1,6 +1,28 @@
 import { useState } from 'react'
 import api from '../lib/api'
 
+const AUTONOMY_CODES = [
+  { code: 'AN', name: 'Andalucía' },
+  { code: 'AR', name: 'Aragón' },
+  { code: 'AS', name: 'Asturias' },
+  { code: 'IB', name: 'Islas Baleares' },
+  { code: 'CN', name: 'Canarias' },
+  { code: 'CB', name: 'Cantabria' },
+  { code: 'CL', name: 'Castilla y León' },
+  { code: 'CM', name: 'Castilla-La Mancha' },
+  { code: 'CT', name: 'Cataluña' },
+  { code: 'VC', name: 'Comunidad Valenciana' },
+  { code: 'EX', name: 'Extremadura' },
+  { code: 'GA', name: 'Galicia' },
+  { code: 'MD', name: 'Madrid' },
+  { code: 'MC', name: 'Murcia' },
+  { code: 'NC', name: 'Navarra' },
+  { code: 'PV', name: 'País Vasco' },
+  { code: 'RI', name: 'La Rioja' },
+  { code: 'CE', name: 'Ceuta' },
+  { code: 'ML', name: 'Melilla' },
+]
+
 interface Props {
   onClose: () => void
   onCreate: () => void
@@ -11,6 +33,7 @@ export default function NewProjectModal({ onClose, onCreate }: Props) {
   const [name, setName] = useState('')
   const [year, setYear] = useState(currentYear + 1)
   const [weekStartsOn, setWeekStartsOn] = useState<'monday' | 'sunday'>('monday')
+  const [autonomyCode, setAutonomyCode] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
@@ -22,7 +45,12 @@ export default function NewProjectModal({ onClose, onCreate }: Props) {
     setError(null)
 
     try {
-      await api.post('/projects', { name: name.trim(), year, weekStartsOn })
+      await api.post('/projects', {
+        name: name.trim(),
+        year,
+        weekStartsOn,
+        autonomyCode: autonomyCode || undefined,
+      })
       onCreate()
     } catch {
       setError('Error al crear el proyecto')
@@ -96,6 +124,24 @@ export default function NewProjectModal({ onClose, onCreate }: Props) {
                 Domingo
               </label>
             </div>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-neutral-700 mb-1">
+              Comunidad Autónoma (festivos)
+            </label>
+            <select
+              value={autonomyCode}
+              onChange={(e) => setAutonomyCode(e.target.value)}
+              className="w-full px-3 py-2 border border-neutral-300 rounded-md text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none"
+            >
+              <option value="">Solo festivos nacionales</option>
+              {AUTONOMY_CODES.map((a) => (
+                <option key={a.code} value={a.code}>
+                  {a.name}
+                </option>
+              ))}
+            </select>
           </div>
 
           {error && <p className="text-sm text-red-600">{error}</p>}

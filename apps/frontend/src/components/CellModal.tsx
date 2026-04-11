@@ -1,24 +1,44 @@
 import { useState, useEffect } from 'react'
-import type { DayCell } from '../lib/calendarTypes'
+import type { DayCell, Holiday, CalEvent } from '../lib/calendarTypes'
 import { MONTH_NAMES } from '../lib/calendarTypes'
 import ColorPicker from './ColorPicker'
+import api from '../lib/api'
 
 interface Props {
   dayNumber: number
   month: number
   year: number
   cell: DayCell | null
+  holidays: Holiday[]
+  events: CalEvent[]
+  saint: string | null
   onSave: (data: {
     bgColor: string | null
     contentJson: { text?: string; emoji?: string } | null
   }) => void
+  onEventsChanged: () => void
   onClose: () => void
 }
 
-export default function CellModal({ dayNumber, month, year, cell, onSave, onClose }: Props) {
+export default function CellModal({
+  dayNumber,
+  month,
+  year,
+  cell,
+  holidays,
+  events,
+  saint,
+  onSave,
+  onEventsChanged,
+  onClose,
+}: Props) {
   const [bgColor, setBgColor] = useState(cell?.bgColor || '')
   const [text, setText] = useState(cell?.contentJson?.text || '')
   const [emoji, setEmoji] = useState(cell?.contentJson?.emoji || '')
+  const [showNewEvent, setShowNewEvent] = useState(false)
+  const [newEventName, setNewEventName] = useState('')
+  const [newEventType, setNewEventType] = useState<'BIRTHDAY' | 'ANNIVERSARY' | 'CUSTOM'>('CUSTOM')
+  const [savingEvent, setSavingEvent] = useState(false)
 
   useEffect(() => {
     const handleKey = (e: KeyboardEvent) => {
@@ -41,18 +61,152 @@ export default function CellModal({ dayNumber, month, year, cell, onSave, onClos
 
   const handleClearBg = () => setBgColor('')
 
+  const handleAddQuickEvent = async () => {
+    if (!newEventName.trim()) return
+    setSavingEvent(true)
+    try {
+      await api.post('/events', {
+        name: newEventName.trim(),
+        day: dayNumber,
+        month,
+        type: newEventType,
+        isRecurring: true,
+      })
+      setNewEventName('')
+      setShowNewEvent(false)
+      onEventsChanged()
+    } catch {
+      // ignore
+    } finally {
+      setSavingEvent(false)
+    }
+  }
+
+  const handleDeleteEvent = async (id: string) => {
+    try {
+      await api.delete(`/events/${id}`)
+      onEventsChanged()
+    } catch {
+      // ignore
+    }
+  }
+
   return (
     <div
       className="fixed inset-0 z-50 flex items-center justify-center bg-black/40"
       onClick={onClose}
     >
       <div
-        className="bg-white rounded-xl shadow-2xl w-full max-w-md mx-4 p-6"
+        className="bg-white rounded-xl shadow-2xl w-full max-w-md mx-4 p-6 max-h-[90vh] overflow-y-auto"
         onClick={(e) => e.stopPropagation()}
       >
         <h2 className="text-lg font-semibold text-neutral-900 mb-1">
           Día {dayNumber} — {MONTH_NAMES[month - 1]} {year}
         </h2>
+        {saint && <p className="text-xs text-neutral-400 mb-1">🕊️ {saint}</p>}
+        <hr className="my-3 border-neutral-200" />
+
+        {/* Holidays */}
+        {holidays.length > 0 && (
+          <div className="mb-4">
+            <h3 className="text-sm font-medium text-red-600 mb-1">🏛️ Festivos</h3>
+            {holidays.map((h) => (
+              <div key={h.id} className="text-xs bg-red-50 text-red-700 rounded px-2 py-1 mb-1">
+                {h.nameEs}
+                {h.scope === 'AUTONOMY' && (
+                  <span className="text-red-400 ml-1">({h.autonomyCode})</span>
+                )}
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* Events */}
+        {events.length > 0 && (
+          <div className="mb-4">
+            <h3 className="text-sm font-medium text-neutral-700 mb-1">📅 Eventos</h3>
+            {events.map((ev) => (
+              <div
+                key={ev.id}
+                className="flex items-center justify-between text-xs rounded px-2 py-1 mb-1"
+                style={{ backgroundColor: ev.color + '15' }}
+              >
+                <span style={{ color: ev.color }}>
+                  {ev.icon || '•'} {ev.name}
+                  {ev.isRecurring && <span className="text-neutral-400 ml-1">(anual)</span>}
+                </span>
+                <button
+                  onClick={() => handleDeleteEvent(ev.id)}
+                  className="text-neutral-400 hover:text-red-500 ml-2"
+                  title="Eliminar evento"
+                >
+                  ✕
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* Quick add event */}
+        <div className="mb-4">
+          {showNewEvent ? (
+            <div className="bg-neutral-50 rounded-lg p-3 space-y-2">
+              <input
+                type="text"
+                value={newEventName}
+                onChange={(e) => setNewEventName(e.target.value)}
+                placeholder="Nombre del evento"
+                className="w-full px-2 py-1.5 border border-neutral-300 rounded text-sm focus:ring-2 focus:ring-primary-500 outline-none"
+                autoFocus
+                maxLength={100}
+                onKeyDown={(e) => e.key === 'Enter' && handleAddQuickEvent()}
+              />
+              <div className="flex gap-1">
+                {[
+                  { v: 'BIRTHDAY' as const, l: '🎂' },
+                  { v: 'ANNIVERSARY' as const, l: '💍' },
+                  { v: 'CUSTOM' as const, l: '📌' },
+                ].map((t) => (
+                  <button
+                    key={t.v}
+                    type="button"
+                    onClick={() => setNewEventType(t.v)}
+                    className={`px-2 py-0.5 text-xs rounded border ${
+                      newEventType === t.v
+                        ? 'bg-primary-50 border-primary-300'
+                        : 'border-neutral-200'
+                    }`}
+                  >
+                    {t.l}
+                  </button>
+                ))}
+              </div>
+              <div className="flex gap-1 justify-end">
+                <button
+                  onClick={() => setShowNewEvent(false)}
+                  className="text-xs text-neutral-500 px-2 py-1"
+                >
+                  Cancelar
+                </button>
+                <button
+                  onClick={handleAddQuickEvent}
+                  disabled={savingEvent || !newEventName.trim()}
+                  className="text-xs bg-primary-600 text-white px-3 py-1 rounded disabled:opacity-50"
+                >
+                  {savingEvent ? '...' : 'Añadir'}
+                </button>
+              </div>
+            </div>
+          ) : (
+            <button
+              onClick={() => setShowNewEvent(true)}
+              className="text-xs text-primary-600 hover:text-primary-800 transition-colors"
+            >
+              + Añadir evento en este día
+            </button>
+          )}
+        </div>
+
         <hr className="my-3 border-neutral-200" />
 
         {/* Background color */}

@@ -9,6 +9,7 @@ import DashboardPage from './pages/DashboardPage'
 import ProjectPage from './pages/ProjectPage'
 import LibraryPage from './pages/LibraryPage'
 import MonthEditorPage from './pages/MonthEditorPage'
+import EventsPage from './pages/EventsPage'
 import './App.css'
 
 function App() {
@@ -47,6 +48,7 @@ function App() {
         <Route path="/projects/:id" element={<ProjectPage />} />
         <Route path="/projects/:projectId/months/:monthId" element={<MonthEditorPage />} />
         <Route path="/library" element={<LibraryPage />} />
+        <Route path="/events" element={<EventsPage />} />
         <Route
           path="/admin"
           element={

@@ -8,6 +8,7 @@ export default function AppLayout() {
   const navLinks = [
     { to: '/', label: 'Mis calendarios' },
     { to: '/library', label: 'Biblioteca' },
+    { to: '/events', label: 'Eventos' },
     ...(user?.role === 'ADMIN' ? [{ to: '/admin', label: 'Administración' }] : []),
   ]
 
