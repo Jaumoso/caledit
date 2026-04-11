@@ -2,13 +2,7 @@ import { useState, useEffect, useCallback, useRef } from 'react'
 import { useParams, useNavigate, Link } from 'react-router-dom'
 import api from '../lib/api'
 import type { GridConfig, DayCell, MonthData, Holiday, CalEvent, Saint } from '../lib/calendarTypes'
-import {
-  DEFAULT_GRID_CONFIG,
-  MONTH_NAMES,
-  PAGE_WIDTH,
-  PAGE_HEIGHT,
-  GRID_TOP_PERCENT,
-} from '../lib/calendarTypes'
+import { DEFAULT_GRID_CONFIG, MONTH_NAMES, PAGE_WIDTH, PAGE_HEIGHT } from '../lib/calendarTypes'
 import CalendarGrid from '../components/CalendarGrid'
 import GridPropertiesPanel from '../components/GridPropertiesPanel'
 import CellModal from '../components/CellModal'
@@ -19,6 +13,7 @@ import ObjectPropertiesPanel from '../components/ObjectPropertiesPanel'
 import AssetPickerModal from '../components/AssetPickerModal'
 import StickerPickerModal from '../components/StickerPickerModal'
 import BackgroundModal from '../components/BackgroundModal'
+import DraggableGridOverlay from '../components/DraggableGridOverlay'
 
 const AUTOSAVE_INTERVAL = 30_000 // 30 seconds
 
@@ -131,6 +126,20 @@ export default function MonthEditorPage() {
     setGridConfig(newConfig)
     setDirty(true)
   }
+
+  const handleGridLayoutChange = useCallback(
+    (rect: { x: number; y: number; width: number; height: number }) => {
+      setGridConfig((prev) => ({
+        ...prev,
+        gridX: rect.x,
+        gridY: rect.y,
+        gridWidth: rect.width,
+        gridHeight: rect.height,
+      }))
+      setDirty(true)
+    },
+    []
+  )
 
   const handleCellClick = (dayNumber: number) => {
     setSelectedDay(dayNumber)
@@ -354,15 +363,15 @@ export default function MonthEditorPage() {
                 />
               </div>
 
-              {/* Calendar Grid overlay — positioned in the lower portion */}
-              <div
-                className={`absolute left-0 right-0 px-4 pb-4 ${editorMode === 'grid' ? '' : 'pointer-events-none'}`}
-                style={{
-                  top: `${GRID_TOP_PERCENT}%`,
-                  bottom: 0,
-                  zIndex: editorMode === 'grid' ? 10 : 2,
-                  opacity: gridConfig.gridOverlayOpacity / 100,
-                }}
+              {/* Calendar Grid overlay — draggable & resizable */}
+              <DraggableGridOverlay
+                x={gridConfig.gridX}
+                y={gridConfig.gridY}
+                width={gridConfig.gridWidth}
+                height={gridConfig.gridHeight}
+                opacity={gridConfig.gridOverlayOpacity}
+                active={editorMode === 'grid'}
+                onLayoutChange={handleGridLayoutChange}
               >
                 <CalendarGrid
                   year={monthData.year}
@@ -375,7 +384,7 @@ export default function MonthEditorPage() {
                   saints={saints}
                   onCellClick={handleCellClick}
                 />
-              </div>
+              </DraggableGridOverlay>
             </div>
           </div>
         </div>

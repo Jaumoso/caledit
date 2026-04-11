@@ -1,4 +1,5 @@
 import type { GridConfig, DayPosition } from '../lib/calendarTypes'
+import { PAGE_WIDTH, PAGE_HEIGHT } from '../lib/calendarTypes'
 import ColorPicker from './ColorPicker'
 import FontSelector from './FontSelector'
 
@@ -29,6 +30,57 @@ export default function GridPropertiesPanel({ config, onChange }: Props) {
       <h3 className="font-semibold text-neutral-800 text-xs uppercase tracking-wider">
         Grid del calendario
       </h3>
+
+      {/* Position & Size */}
+      <section>
+        <h4 className="text-xs font-medium text-neutral-600 mb-2">Posición y tamaño</h4>
+        <div className="grid grid-cols-2 gap-2">
+          <div>
+            <label className="text-[10px] text-neutral-500 block mb-0.5">X (px)</label>
+            <input
+              type="number"
+              min={0}
+              max={PAGE_WIDTH}
+              value={config.gridX}
+              onChange={(e) => update('gridX', Number(e.target.value))}
+              className="w-full text-xs border border-neutral-300 rounded px-2 py-1 outline-none focus:ring-1 focus:ring-primary-500"
+            />
+          </div>
+          <div>
+            <label className="text-[10px] text-neutral-500 block mb-0.5">Y (px)</label>
+            <input
+              type="number"
+              min={0}
+              max={PAGE_HEIGHT}
+              value={config.gridY}
+              onChange={(e) => update('gridY', Number(e.target.value))}
+              className="w-full text-xs border border-neutral-300 rounded px-2 py-1 outline-none focus:ring-1 focus:ring-primary-500"
+            />
+          </div>
+          <div>
+            <label className="text-[10px] text-neutral-500 block mb-0.5">Ancho (px)</label>
+            <input
+              type="number"
+              min={100}
+              max={PAGE_WIDTH}
+              value={config.gridWidth}
+              onChange={(e) => update('gridWidth', Number(e.target.value))}
+              className="w-full text-xs border border-neutral-300 rounded px-2 py-1 outline-none focus:ring-1 focus:ring-primary-500"
+            />
+          </div>
+          <div>
+            <label className="text-[10px] text-neutral-500 block mb-0.5">Alto (px)</label>
+            <input
+              type="number"
+              min={50}
+              max={PAGE_HEIGHT}
+              value={config.gridHeight}
+              onChange={(e) => update('gridHeight', Number(e.target.value))}
+              className="w-full text-xs border border-neutral-300 rounded px-2 py-1 outline-none focus:ring-1 focus:ring-primary-500"
+            />
+          </div>
+        </div>
+      </section>
 
       {/* Background */}
       <section>

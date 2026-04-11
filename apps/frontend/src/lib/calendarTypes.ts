@@ -2,6 +2,10 @@ export interface GridConfig {
   bgColor: string
   bgOpacity: number
   gridOverlayOpacity: number // overall grid overlay opacity (0-100) so background shows through
+  gridX: number // px from left
+  gridY: number // px from top
+  gridWidth: number // px
+  gridHeight: number // px
   borderColor: string
   borderWidth: number
   borderStyle: 'solid' | 'dashed' | 'dotted' | 'none'
@@ -25,8 +29,11 @@ export interface GridConfig {
 export const PAGE_WIDTH = 794
 export const PAGE_HEIGHT = 1123
 
-// Default split: grid occupies bottom ~42%
-export const GRID_TOP_PERCENT = 58
+// Default grid layout (bottom ~42% of the page)
+export const DEFAULT_GRID_X = 16
+export const DEFAULT_GRID_Y = 652
+export const DEFAULT_GRID_WIDTH = 762
+export const DEFAULT_GRID_HEIGHT = 455
 
 export type DayPosition =
   | 'top-left'
@@ -106,6 +113,10 @@ export const DEFAULT_GRID_CONFIG: GridConfig = {
   bgColor: '#FFFFFF',
   bgOpacity: 100,
   gridOverlayOpacity: 90,
+  gridX: 16,
+  gridY: 652,
+  gridWidth: 762,
+  gridHeight: 455,
   borderColor: '#E2DDD6',
   borderWidth: 1,
   borderStyle: 'solid',

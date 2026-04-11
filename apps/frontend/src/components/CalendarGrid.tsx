@@ -83,14 +83,14 @@ export default function CalendarGrid({
 
   return (
     <div
-      className="rounded-lg overflow-hidden"
+      className="rounded-lg overflow-hidden flex flex-col h-full"
       style={{
         backgroundColor: config.bgColor,
         opacity: config.bgOpacity / 100,
       }}
     >
       {/* Weekday headers */}
-      <div className="grid grid-cols-7" style={{ borderBottom: borderStyle }}>
+      <div className="grid grid-cols-7 shrink-0" style={{ borderBottom: borderStyle }}>
         {weekdays.map((day, i) => (
           <div
             key={i}
@@ -109,112 +109,114 @@ export default function CalendarGrid({
       </div>
 
       {/* Day grid */}
-      {Array.from({ length: rows }, (_, row) => (
-        <div
-          key={row}
-          className="grid grid-cols-7"
-          style={{ borderBottom: row < rows - 1 ? borderStyle : undefined }}
-        >
-          {Array.from({ length: 7 }, (_, col) => {
-            const cellIndex = row * 7 + col
-            const dayNumber = cellIndex - firstDay + 1
-            const isValid = dayNumber >= 1 && dayNumber <= daysInMonth
-            const weekend = isValid && isWeekend(dayNumber, year, month)
-            const cell = isValid ? cellMap.get(dayNumber) : undefined
-            const dayHolidays = isValid ? holidayMap.get(dayNumber) : undefined
-            const dayEvents = isValid ? eventMap.get(dayNumber) : undefined
-            const saint = isValid ? saintMap.get(dayNumber) : undefined
+      <div className="flex-1 flex flex-col">
+        {Array.from({ length: rows }, (_, row) => (
+          <div
+            key={row}
+            className="grid grid-cols-7 flex-1"
+            style={{ borderBottom: row < rows - 1 ? borderStyle : undefined }}
+          >
+            {Array.from({ length: 7 }, (_, col) => {
+              const cellIndex = row * 7 + col
+              const dayNumber = cellIndex - firstDay + 1
+              const isValid = dayNumber >= 1 && dayNumber <= daysInMonth
+              const weekend = isValid && isWeekend(dayNumber, year, month)
+              const cell = isValid ? cellMap.get(dayNumber) : undefined
+              const dayHolidays = isValid ? holidayMap.get(dayNumber) : undefined
+              const dayEvents = isValid ? eventMap.get(dayNumber) : undefined
+              const saint = isValid ? saintMap.get(dayNumber) : undefined
 
-            const isHoliday = config.showHolidays && dayHolidays && dayHolidays.length > 0
-            const hasEvents = config.showEvents && dayEvents && dayEvents.length > 0
+              const isHoliday = config.showHolidays && dayHolidays && dayHolidays.length > 0
+              const hasEvents = config.showEvents && dayEvents && dayEvents.length > 0
 
-            const cellBg =
-              cell?.bgColor ||
-              (isHoliday ? config.holidayBgColor : undefined) ||
-              (weekend ? config.weekendBgColor : undefined)
+              const cellBg =
+                cell?.bgColor ||
+                (isHoliday ? config.holidayBgColor : undefined) ||
+                (weekend ? config.weekendBgColor : undefined)
 
-            return (
-              <div
-                key={col}
-                className={`relative min-h-[3.5rem] p-1 flex ${POSITION_CLASSES[config.dayPosition]} transition-colors ${
-                  isValid ? 'cursor-pointer hover:bg-primary-50/50' : ''
-                }`}
-                style={{
-                  backgroundColor: cellBg || undefined,
-                  borderRight: col < 6 ? borderStyle : undefined,
-                }}
-                onClick={() => isValid && onCellClick(dayNumber)}
-              >
-                {isValid && (
-                  <>
-                    <span
-                      className="select-none leading-none z-10"
-                      style={{
-                        fontFamily: config.dayFontFamily,
-                        fontSize: `${config.dayFontSize}px`,
-                        color: isHoliday ? '#DC2626' : config.dayFontColor,
-                        fontWeight: isHoliday ? 'bold' : config.dayFontWeight,
-                      }}
-                    >
-                      {dayNumber}
-                    </span>
-
-                    {/* Saint name */}
-                    {config.showSaints && saint && (
-                      <span className="absolute top-0.5 left-0.5 text-[7px] text-neutral-400 leading-tight max-w-[90%] truncate">
-                        {saint}
-                      </span>
-                    )}
-
-                    {/* Holiday label */}
-                    {isHoliday && dayHolidays && (
-                      <span className="absolute bottom-0.5 left-0.5 right-0.5 text-[8px] text-red-600 font-medium truncate leading-tight">
-                        {dayHolidays[0].nameEs}
-                      </span>
-                    )}
-
-                    {/* Events indicators */}
-                    {hasEvents && !isHoliday && dayEvents && (
+              return (
+                <div
+                  key={col}
+                  className={`relative p-1 flex ${POSITION_CLASSES[config.dayPosition]} transition-colors ${
+                    isValid ? 'cursor-pointer hover:bg-primary-50/50' : ''
+                  }`}
+                  style={{
+                    backgroundColor: cellBg || undefined,
+                    borderRight: col < 6 ? borderStyle : undefined,
+                  }}
+                  onClick={() => isValid && onCellClick(dayNumber)}
+                >
+                  {isValid && (
+                    <>
                       <span
-                        className="absolute bottom-0.5 left-0.5 right-0.5 text-[8px] truncate leading-tight"
-                        style={{ color: dayEvents[0].color }}
+                        className="select-none leading-none z-10"
+                        style={{
+                          fontFamily: config.dayFontFamily,
+                          fontSize: `${config.dayFontSize}px`,
+                          color: isHoliday ? '#DC2626' : config.dayFontColor,
+                          fontWeight: isHoliday ? 'bold' : config.dayFontWeight,
+                        }}
                       >
-                        {dayEvents[0].icon || '•'} {dayEvents[0].name}
+                        {dayNumber}
                       </span>
-                    )}
 
-                    {/* Event dots when holiday takes bottom text */}
-                    {hasEvents && isHoliday && dayEvents && (
-                      <div className="absolute top-0.5 right-0.5 flex gap-0.5">
-                        {dayEvents.slice(0, 3).map((ev) => (
-                          <span
-                            key={ev.id}
-                            className="w-1.5 h-1.5 rounded-full"
-                            style={{ backgroundColor: ev.color }}
-                            title={ev.name}
-                          />
-                        ))}
-                      </div>
-                    )}
+                      {/* Saint name */}
+                      {config.showSaints && saint && (
+                        <span className="absolute top-0.5 left-0.5 text-[7px] text-neutral-400 leading-tight max-w-[90%] truncate">
+                          {saint}
+                        </span>
+                      )}
 
-                    {/* Cell text (when no holiday/event text shown) */}
-                    {cell?.contentJson?.text && !isHoliday && !hasEvents && (
-                      <span className="absolute bottom-0.5 left-0.5 right-0.5 text-[9px] text-neutral-500 truncate leading-tight">
-                        {cell.contentJson.text}
-                      </span>
-                    )}
-                    {cell?.contentJson?.emoji && (
-                      <span className="absolute top-0.5 left-0.5 text-xs">
-                        {cell.contentJson.emoji}
-                      </span>
-                    )}
-                  </>
-                )}
-              </div>
-            )
-          })}
-        </div>
-      ))}
+                      {/* Holiday label */}
+                      {isHoliday && dayHolidays && (
+                        <span className="absolute bottom-0.5 left-0.5 right-0.5 text-[8px] text-red-600 font-medium truncate leading-tight">
+                          {dayHolidays[0].nameEs}
+                        </span>
+                      )}
+
+                      {/* Events indicators */}
+                      {hasEvents && !isHoliday && dayEvents && (
+                        <span
+                          className="absolute bottom-0.5 left-0.5 right-0.5 text-[8px] truncate leading-tight"
+                          style={{ color: dayEvents[0].color }}
+                        >
+                          {dayEvents[0].icon || '•'} {dayEvents[0].name}
+                        </span>
+                      )}
+
+                      {/* Event dots when holiday takes bottom text */}
+                      {hasEvents && isHoliday && dayEvents && (
+                        <div className="absolute top-0.5 right-0.5 flex gap-0.5">
+                          {dayEvents.slice(0, 3).map((ev) => (
+                            <span
+                              key={ev.id}
+                              className="w-1.5 h-1.5 rounded-full"
+                              style={{ backgroundColor: ev.color }}
+                              title={ev.name}
+                            />
+                          ))}
+                        </div>
+                      )}
+
+                      {/* Cell text (when no holiday/event text shown) */}
+                      {cell?.contentJson?.text && !isHoliday && !hasEvents && (
+                        <span className="absolute bottom-0.5 left-0.5 right-0.5 text-[9px] text-neutral-500 truncate leading-tight">
+                          {cell.contentJson.text}
+                        </span>
+                      )}
+                      {cell?.contentJson?.emoji && (
+                        <span className="absolute top-0.5 left-0.5 text-xs">
+                          {cell.contentJson.emoji}
+                        </span>
+                      )}
+                    </>
+                  )}
+                </div>
+              )
+            })}
+          </div>
+        ))}
+      </div>
     </div>
   )
 }
