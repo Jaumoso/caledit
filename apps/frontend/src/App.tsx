@@ -11,6 +11,7 @@ import LibraryPage from './pages/LibraryPage'
 import MonthEditorPage from './pages/MonthEditorPage'
 import EventsPage from './pages/EventsPage'
 import TemplatesPage from './pages/TemplatesPage'
+import RenderMonthPage from './pages/RenderMonthPage'
 import './App.css'
 
 function App() {
@@ -34,6 +35,9 @@ function App() {
 
   return (
     <Routes>
+      {/* Public render route for Puppeteer export */}
+      <Route path="/render/:monthId" element={<RenderMonthPage />} />
+
       <Route
         path="/login"
         element={isAuthenticated ? <Navigate to="/" replace /> : <LoginPage />}

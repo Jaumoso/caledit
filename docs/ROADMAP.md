@@ -256,15 +256,15 @@
 
 ### Tareas:
 
-- [ ] Contenedor Docker para Puppeteer (sin sandbox, usuario no-root)
-- [ ] Ruta interna de renderizado (URL que Puppeteer abre para cada mes)
-- [ ] Backend: cola de trabajos de exportación con estado
-- [ ] Puppeteer: captura PNG a 300 DPI (deviceScaleFactor)
-- [ ] Puppeteer: generación de PDF multipágina A4
-- [ ] Opción de guía de encuadernación (línea central)
-- [ ] Frontend: modal de exportación completo
-- [ ] Frontend: polling de estado + descarga automática
-- [ ] Configuración de nombre de archivo
+- [x] Contenedor Docker para Puppeteer (sin sandbox, usuario no-root)
+- [x] Ruta interna de renderizado (URL que Puppeteer abre para cada mes)
+- [x] Backend: cola de trabajos de exportación con estado
+- [x] Puppeteer: captura PNG a 300 DPI (deviceScaleFactor)
+- [x] Puppeteer: generación de PDF multipágina A4
+- [x] Opción de guía de encuadernación (línea central)
+- [x] Frontend: modal de exportación completo
+- [x] Frontend: polling de estado + descarga automática
+- [x] Configuración de nombre de archivo
 
 **Entregable:** Se puede exportar el calendario completo en PDF listo para imprimir.
 

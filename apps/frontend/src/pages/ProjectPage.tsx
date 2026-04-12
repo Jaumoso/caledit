@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { useParams, Link, useNavigate } from 'react-router-dom'
 import api from '../lib/api'
 import ApplyTemplateModal from '../components/ApplyTemplateModal'
+import ExportModal from '../components/ExportModal'
 
 interface CalendarMonth {
   id: string
@@ -63,6 +64,7 @@ export default function ProjectPage() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [showApplyTemplate, setShowApplyTemplate] = useState(false)
+  const [showExport, setShowExport] = useState(false)
 
   useEffect(() => {
     const fetchProject = async () => {
@@ -141,6 +143,9 @@ export default function ProjectPage() {
           </div>
         </div>
         <div className="flex items-center gap-3">
+          <button onClick={() => setShowExport(true)} className="btn btn-primary text-sm">
+            📄 Exportar
+          </button>
           <button onClick={() => setShowApplyTemplate(true)} className="btn btn-secondary text-sm">
             📋 Aplicar plantilla
           </button>
@@ -217,6 +222,16 @@ export default function ProjectPage() {
               .then(({ data }) => setProject(data.project))
               .catch(() => {})
           }}
+        />
+      )}
+
+      {/* Export modal */}
+      {showExport && project && (
+        <ExportModal
+          projectId={project.id}
+          projectName={project.name}
+          projectYear={project.year}
+          onClose={() => setShowExport(false)}
         />
       )}
     </div>

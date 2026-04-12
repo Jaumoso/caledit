@@ -39,8 +39,15 @@ services:
     build:
       context: .
       dockerfile: docker/puppeteer/Dockerfile
+    environment:
+      - PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium-browser
+      - FRONTEND_URL=http://frontend:5173
     ports:
-      - "9222:9222"
+      - "4000:4000"
+    volumes:
+      - ./data/exports:/data/exports
+    depends_on:
+      - frontend
     restart: unless-stopped
 
 volumes:

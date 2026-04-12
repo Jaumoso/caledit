@@ -8,33 +8,33 @@ RUN apk add --no-cache \
     freetype-dev \
     harfbuzz \
     ca-certificates \
-    ttf-freefont
+    ttf-freefont \
+    zip
+
+# Tell Puppeteer to use the installed Chromium
+ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
+ENV PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium-browser
 
 # Create app directory
 WORKDIR /app
 
-# Install pnpm
-RUN npm install -g pnpm
+# Copy package files and install
+COPY docker/puppeteer/package.json ./
+RUN npm install --production
 
-# Copy package files
-COPY package.json pnpm-lock.yaml ./
+# Copy service source
+COPY docker/puppeteer/index.js ./
 
-# Install dependencies
-RUN pnpm install --prod --frozen-lockfile
-
-# Copy source code
-COPY . .
+# Create exports directory
+RUN mkdir -p /data/exports
 
 # Create non-root user
-RUN addgroup -g 1001 -S nodejs
-RUN adduser -S puppeteer -u 1001
+RUN addgroup -g 1001 -S nodejs && \
+    adduser -S pptruser -u 1001 -G nodejs && \
+    chown -R pptruser:nodejs /app /data
 
-# Change ownership
-RUN chown -R puppeteer:nodejs /app
-USER puppeteer
+USER pptruser
 
-# Expose port
-EXPOSE 9222
+EXPOSE 4000
 
-# Start Puppeteer service
-CMD ["node", "puppeteer-service.js"]
+CMD ["node", "index.js"]

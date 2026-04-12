@@ -31,8 +31,10 @@
     "fastify": "^5.8.4",
     "fastify-plugin": "^5.1.0",
     "jsonwebtoken": "^9.0.3",
+    "pdf-lib": "^1.17.1",
     "pg": "^8.20.0",
     "prisma": "^7.7.0",
+    "puppeteer": "^24.40.0",
     "sharp": "^0.34.5",
     "zod": "^4.3.6"
   },

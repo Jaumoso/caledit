@@ -26,6 +26,7 @@ model User {
   assetFolders AssetFolder[]
   events       Event[]
   templates    Template[]
+  exportJobs   ExportJob[]
 
   @@map("users")
 }
@@ -46,6 +47,7 @@ model Project {
 
   // Relations
   months CalendarMonth[]
+  exportJobs ExportJob[]
 
   @@map("projects")
 }
@@ -199,4 +201,39 @@ enum EventType {
 enum HolidayScope {
   NATIONAL
   AUTONOMY
+}
+
+enum ExportFormat {
+  PDF
+  PNG
+}
+
+enum ExportStatus {
+  PENDING
+  PROCESSING
+  COMPLETED
+  FAILED
+}
+
+model ExportJob {
+  id           String       @id @default(cuid())
+  projectId    String
+  project      Project      @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  userId       String
+  user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  format       ExportFormat @default(PDF)
+  status       ExportStatus @default(PENDING)
+  progress     Int          @default(0)
+  totalPages   Int          @default(12)
+  currentPage  Int          @default(0)
+  filename     String?
+  filePath     String?
+  fileSize     Int?
+  dpi          Int          @default(300)
+  bindingGuide Boolean      @default(false)
+  error        String?
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+
+  @@map("export_jobs")
 }

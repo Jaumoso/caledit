@@ -17,6 +17,8 @@ import monthRoutes from './routes/months.js'
 import holidayRoutes from './routes/holidays.js'
 import eventRoutes from './routes/events.js'
 import templateRoutes from './routes/templates.js'
+import renderRoutes from './routes/render.js'
+import exportRoutes from './routes/exports.js'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
@@ -92,6 +94,16 @@ async function createServer() {
 
   // Register template routes
   await fastify.register(templateRoutes, { prefix: '/api' })
+
+  // Register render routes (public, token-authenticated for Puppeteer)
+  await fastify.register(renderRoutes, { prefix: '/api' })
+
+  // Register export routes
+  await fastify.register(exportRoutes, { prefix: '/api' })
+
+  // Serve export files
+  const exportsDir = process.env.EXPORT_PATH || path.join(__dirname, '../exports')
+  if (!fs.existsSync(exportsDir)) fs.mkdirSync(exportsDir, { recursive: true })
 
   // Catch-all handler for SPA (must be last)
   fastify.setNotFoundHandler(async (request, reply) => {

@@ -103,6 +103,25 @@ export interface Template {
   createdAt: Date
 }
 
+export interface ExportJob {
+  id: string
+  projectId: string
+  userId: string
+  format: 'PDF' | 'PNG'
+  status: 'PENDING' | 'PROCESSING' | 'COMPLETED' | 'FAILED'
+  progress: number
+  totalPages: number
+  currentPage: number
+  filename: string | null
+  filePath: string | null
+  fileSize: number | null
+  dpi: number
+  bindingGuide: boolean
+  error: string | null
+  createdAt: Date
+  updatedAt: Date
+}
+
 // API Response types
 export interface ApiResponse<T> {
   success: boolean
