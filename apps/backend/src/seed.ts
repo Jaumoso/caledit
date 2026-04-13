@@ -1,3 +1,4 @@
+import 'dotenv/config'
 import bcrypt from 'bcrypt'
 import { prisma } from './prisma.js'
 import { generateAllHolidays } from './data/holidays.js'

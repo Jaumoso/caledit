@@ -1,4 +1,5 @@
 import axios from 'axios'
+import { toast } from '../stores/toastStore'
 
 const api = axios.create({
   baseURL: '/api',
@@ -62,6 +63,39 @@ api.interceptors.response.use(
       } finally {
         isRefreshing = false
       }
+    }
+
+    return Promise.reject(error)
+  }
+)
+
+// Friendly error messages
+const ERROR_MESSAGES: Record<number, string> = {
+  400: 'Los datos enviados no son válidos',
+  403: 'No tienes permisos para esta acción',
+  404: 'El recurso no se ha encontrado',
+  413: 'El archivo es demasiado grande',
+  429: 'Demasiadas peticiones, espera un momento',
+  500: 'Error del servidor, inténtalo de nuevo',
+}
+
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    const status = error.response?.status
+    const url = error.config?.url || ''
+
+    // Don't show toasts for auth endpoints or silent requests
+    const isSilent =
+      url === '/auth/me' ||
+      url === '/auth/refresh' ||
+      url === '/auth/login' ||
+      error.config?._silent
+
+    if (!isSilent && status && status >= 400) {
+      const serverMsg = error.response?.data?.message
+      const msg = serverMsg || ERROR_MESSAGES[status] || 'Ha ocurrido un error inesperado'
+      toast.error(msg)
     }
 
     return Promise.reject(error)

@@ -55,6 +55,15 @@
 
 El servidor ya dispone de un reverse proxy externo que gestiona SSL y enrutamiento. Añadir nginx interno sería duplicar responsabilidades sin ningún beneficio a esta escala de uso. Fastify con `@fastify/static` sirve el frontend compilado y los assets con rendimiento más que suficiente para uso doméstico/familiar.
 
+### Entorno de desarrollo vs producción
+
+| Aspecto   | Desarrollo                        | Producción                                             |
+| --------- | --------------------------------- | ------------------------------------------------------ |
+| Frontend  | Vite dev server (`:5173`) con HMR | Build estático servido por Fastify (`@fastify/static`) |
+| API proxy | Vite proxy `/api` → `:3000`       | Fastify sirve todo en `:3000`                          |
+| DB        | Docker Compose solo postgres      | Docker Compose completo                                |
+| Build     | No necesario                      | `pnpm build` en `apps/frontend` genera `dist/`         |
+
 ---
 
 ## 2. Diagrama de componentes del Frontend

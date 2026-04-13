@@ -1,12 +1,14 @@
+import { config } from 'dotenv'
+import path from 'path'
+import fs from 'fs'
+import { fileURLToPath } from 'url'
 import Fastify from 'fastify'
 import fastifyCookie from '@fastify/cookie'
 import fastifyCors from '@fastify/cors'
 import fastifyHelmet from '@fastify/helmet'
 import fastifyStatic from '@fastify/static'
 import fastifyMultipart from '@fastify/multipart'
-import path from 'path'
-import fs from 'fs'
-import { fileURLToPath } from 'url'
+import rateLimit from '@fastify/rate-limit'
 import authPlugin from './plugins/auth.js'
 import authRoutes from './routes/auth.js'
 import userRoutes from './routes/users.js'
@@ -22,6 +24,7 @@ import exportRoutes from './routes/exports.js'
 import coverRoutes from './routes/covers.js'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
+config({ path: path.resolve(__dirname, '..', '.env') })
 
 async function createServer() {
   const fastify = Fastify({
@@ -41,6 +44,12 @@ async function createServer() {
   // Register multipart for file uploads
   await fastify.register(fastifyMultipart, {
     limits: { fileSize: 10 * 1024 * 1024 }, // 10MB
+  })
+
+  // Rate limiting — global baseline + stricter for auth
+  await fastify.register(rateLimit, {
+    max: 200,
+    timeWindow: '1 minute',
   })
 
   // Register custom plugins

@@ -11,59 +11,67 @@ const authRoutes: FastifyPluginAsync = async (fastify) => {
     rememberMe: z.boolean().optional(),
   })
 
-  // POST /auth/login
-  fastify.post('/auth/login', async (request, reply) => {
-    const parsed = loginSchema.safeParse(request.body)
-    if (!parsed.success) {
-      return reply.code(400).send({ error: 'VALIDATION_ERROR', message: 'Invalid input' })
-    }
-    const { email, password, rememberMe } = parsed.data
+  // POST /auth/login — stricter rate limit (5 attempts per minute)
+  fastify.post(
+    '/auth/login',
+    { config: { rateLimit: { max: 5, timeWindow: '1 minute' } } },
+    async (request, reply) => {
+      const parsed = loginSchema.safeParse(request.body)
+      if (!parsed.success) {
+        return reply.code(400).send({ error: 'VALIDATION_ERROR', message: 'Invalid input' })
+      }
+      const { email, password, rememberMe } = parsed.data
 
-    const user = await prisma.user.findUnique({ where: { email } })
+      const user = await prisma.user.findUnique({ where: { email } })
 
-    if (!user?.isActive) {
-      return reply.code(401).send({ error: 'INVALID_CREDENTIALS', message: 'Invalid credentials' })
-    }
+      if (!user?.isActive) {
+        return reply
+          .code(401)
+          .send({ error: 'INVALID_CREDENTIALS', message: 'Invalid credentials' })
+      }
 
-    const isValidPassword = await bcrypt.compare(password, user.password)
-    if (!isValidPassword) {
-      return reply.code(401).send({ error: 'INVALID_CREDENTIALS', message: 'Invalid credentials' })
-    }
+      const isValidPassword = await bcrypt.compare(password, user.password)
+      if (!isValidPassword) {
+        return reply
+          .code(401)
+          .send({ error: 'INVALID_CREDENTIALS', message: 'Invalid credentials' })
+      }
 
-    const { accessToken, refreshToken } = fastify.generateTokens({
-      id: user.id,
-      email: user.email,
-      name: user.name,
-      role: user.role,
-    })
-
-    const maxAge = rememberMe ? 7 * 24 * 60 * 60 : 15 * 60
-
-    reply
-      .setCookie('token', accessToken, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
-        sameSite: 'strict',
-        path: '/',
-        maxAge,
+      const { accessToken, refreshToken } = fastify.generateTokens({
+        id: user.id,
+        email: user.email,
+        name: user.name,
+        role: user.role,
       })
-      .setCookie('refreshToken', refreshToken, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
-        sameSite: 'strict',
-        path: '/api/auth/refresh',
-        maxAge: 30 * 24 * 60 * 60, // 30 days
-      })
-      .send({
-        user: {
-          id: user.id,
-          email: user.email,
-          name: user.name,
-          role: user.role,
-          language: user.language,
-        },
-      })
-  })
+
+      const maxAge = rememberMe ? 7 * 24 * 60 * 60 : 15 * 60
+
+      reply
+        .setCookie('token', accessToken, {
+          httpOnly: true,
+          secure: process.env.NODE_ENV === 'production',
+          sameSite: 'strict',
+          path: '/',
+          maxAge,
+        })
+        .setCookie('refreshToken', refreshToken, {
+          httpOnly: true,
+          secure: process.env.NODE_ENV === 'production',
+          sameSite: 'strict',
+          path: '/api/auth/refresh',
+          maxAge: 30 * 24 * 60 * 60, // 30 days
+        })
+        .send({
+          user: {
+            id: user.id,
+            email: user.email,
+            name: user.name,
+            role: user.role,
+            language: user.language,
+          },
+        })
+    }
+  )
 
   // POST /auth/logout
   fastify.post('/auth/logout', async (_request, reply) => {

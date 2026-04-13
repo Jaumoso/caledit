@@ -277,11 +277,13 @@
 
 ### Tareas:
 
-- [ ] Onboarding breve (tooltip tour en primer uso)
-- [ ] Tooltips en todas las herramientas del editor
-- [ ] Mensajes de error amigables en toda la app
-- [ ] Optimización de rendimiento (lazy loading de assets, compresión)
-- [ ] Rate limiting en rutas de autenticación y API (`@fastify/rate-limit`)
+- [x] Onboarding breve (tooltip tour en primer uso)
+- [x] Tooltips en todas las herramientas del editor
+- [x] Mensajes de error amigables en toda la app (toasts)
+- [x] Optimización de rendimiento (lazy loading de páginas con React.lazy + Suspense)
+- [x] Rate limiting en rutas de autenticación y API (`@fastify/rate-limit`)
+- [x] Toggle mostrar/ocultar contraseña en login
+- [x] Corrección build frontend para TypeScript 6
 - [ ] Tests de los flujos principales (Playwright)
 - [ ] Documentación de uso básico (guía de usuario en PDF)
 - [ ] Configurar backup automático del volumen de datos

@@ -9,8 +9,6 @@ const EVENT_TYPES = [
   { value: 'CUSTOM', label: 'Personalizado', icon: '📌' },
 ] as const
 
-const DEFAULT_COLORS = ['#C8502A', '#2563EB', '#059669', '#7C3AED', '#DB2777', '#EA580C']
-
 export default function EventsPage() {
   const [events, setEvents] = useState<CalEvent[]>([])
   const [loading, setLoading] = useState(true)

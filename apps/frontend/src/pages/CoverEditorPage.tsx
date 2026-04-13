@@ -261,6 +261,7 @@ export default function CoverEditorPage() {
 
       {showStickerPicker && (
         <StickerPickerModal
+          isOpen={showStickerPicker}
           onSelect={(emoji) => {
             handleStickerSelect(emoji)
             setShowStickerPicker(false)
@@ -271,9 +272,10 @@ export default function CoverEditorPage() {
 
       {showBackgroundModal && (
         <BackgroundModal
+          isOpen={showBackgroundModal}
           editorRef={canvasEditorRef}
           onClose={() => setShowBackgroundModal(false)}
-          onPickAsset={() => {
+          onOpenAssetPicker={() => {
             setBgAssetMode(true)
             setShowAssetPicker(true)
             setShowBackgroundModal(false)

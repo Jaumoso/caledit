@@ -299,7 +299,7 @@ function getFilterValue(
   const filter = filters.find(
     (f: unknown) => f && (f as Record<string, unknown>).type === filterType
   )
-  if (filter) return (filter as Record<string, number>)[prop] ?? defaultVal
+  if (filter) return (filter as unknown as Record<string, number>)[prop] ?? defaultVal
   return defaultVal
 }
 
@@ -321,7 +321,7 @@ async function updateImageFilter(
     (f: unknown) => f && (f as Record<string, unknown>).type === filterType
   )
   if (idx >= 0) {
-    ;(img.filters[idx] as Record<string, unknown>)[filterName] = value
+    ;(img.filters[idx] as unknown as Record<string, unknown>)[filterName] = value
   } else {
     img.filters.push(new FilterClass({ [filterName]: value }))
   }
