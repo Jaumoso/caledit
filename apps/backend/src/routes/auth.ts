@@ -2,7 +2,7 @@ import { FastifyPluginAsync } from 'fastify'
 import { z } from 'zod'
 import bcrypt from 'bcrypt'
 import jwt from 'jsonwebtoken'
-import { prisma } from '@/prisma.js'
+import { prisma } from '../prisma.js'
 import { rateLimitConfig } from '@/config.js'
 
 const rateLimit = rateLimitConfig.login

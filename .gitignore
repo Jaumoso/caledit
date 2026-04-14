@@ -91,3 +91,4 @@ postgres_data/
 
 # Application data
 data/uploads/
+uploads
