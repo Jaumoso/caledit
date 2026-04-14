@@ -82,61 +82,72 @@ const authRoutes: FastifyPluginAsync = async (fastify) => {
   })
 
   // POST /auth/refresh
-  fastify.post('/auth/refresh', async (request, reply) => {
-    const refreshToken = request.cookies.refreshToken
+  fastify.post(
+    '/auth/refresh',
+    {
+      config: {
+        rateLimit: {
+          max: 30,
+          timeWindow: '1 minute',
+        },
+      },
+    },
+    async (request, reply) => {
+      const refreshToken = request.cookies.refreshToken
 
-    if (!refreshToken) {
-      return reply.code(401).send({ error: 'UNAUTHORIZED', message: 'No refresh token provided' })
-    }
-
-    try {
-      const decoded = jwt.verify(
-        refreshToken,
-        process.env.JWT_SECRET || 'your-jwt-secret-change-in-production'
-      ) as { id: string }
-
-      const user = await prisma.user.findUnique({ where: { id: decoded.id } })
-
-      if (!user?.isActive) {
-        return reply.code(401).send({ error: 'UNAUTHORIZED', message: 'Invalid refresh token' })
+      if (!refreshToken) {
+        return reply.code(401).send({ error: 'UNAUTHORIZED', message: 'No refresh token provided' })
       }
 
-      const { accessToken, refreshToken: newRefreshToken } = fastify.generateTokens({
-        id: user.id,
-        email: user.email,
-        name: user.name,
-        role: user.role,
-      })
+      try {
+        const decoded = jwt.verify(
+          refreshToken,
+          process.env.JWT_SECRET || 'your-jwt-secret-change-in-production'
+        ) as { id: string }
 
-      reply
-        .setCookie('token', accessToken, {
-          httpOnly: true,
-          secure: process.env.NODE_ENV === 'production',
-          sameSite: 'strict',
-          path: '/',
-          maxAge: 15 * 60,
+        const user = await prisma.user.findUnique({ where: { id: decoded.id } })
+
+        if (!user?.isActive) {
+          return reply.code(401).send({ error: 'UNAUTHORIZED', message: 'Invalid refresh token' })
+        }
+
+        const { accessToken, refreshToken: newRefreshToken } = fastify.generateTokens({
+          id: user.id,
+          email: user.email,
+          name: user.name,
+          role: user.role,
         })
-        .setCookie('refreshToken', newRefreshToken, {
-          httpOnly: true,
-          secure: process.env.NODE_ENV === 'production',
-          sameSite: 'strict',
-          path: '/api/auth/refresh',
-          maxAge: 30 * 24 * 60 * 60,
-        })
-        .send({
-          user: {
-            id: user.id,
-            email: user.email,
-            name: user.name,
-            role: user.role,
-            language: user.language,
-          },
-        })
-    } catch (error) {
-      fastify.log.warn('Refresh token validation failed: %s', (error as Error).message)
-      return reply.code(401).send({ error: 'UNAUTHORIZED', message: 'Invalid refresh token' })
+
+        reply
+          .setCookie('token', accessToken, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: 'strict',
+            path: '/',
+            maxAge: 15 * 60,
+          })
+          .setCookie('refreshToken', newRefreshToken, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: 'strict',
+            path: '/api/auth/refresh',
+            maxAge: 30 * 24 * 60 * 60,
+          })
+          .send({
+            user: {
+              id: user.id,
+              email: user.email,
+              name: user.name,
+              role: user.role,
+              language: user.language,
+            },
+          })
+      } catch (error) {
+        fastify.log.warn('Refresh token validation failed: %s', (error as Error).message)
+        return reply.code(401).send({ error: 'UNAUTHORIZED', message: 'Invalid refresh token' })
+      }
     }
-  })
+  )
 
   // GET /auth/me
   fastify.get('/auth/me', { preHandler: fastify.authenticate }, async (request, reply) => {
