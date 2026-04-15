@@ -5,7 +5,8 @@ import jwt from 'jsonwebtoken'
 import { prisma } from '../prisma.js'
 import { rateLimitConfig } from '@/config.js'
 
-const rateLimit = rateLimitConfig.login
+const loginRateLimit = rateLimitConfig.login
+const authRateLimit = rateLimitConfig.strict
 
 const authRoutes: FastifyPluginAsync = async (fastify) => {
   const loginSchema = z.object({
@@ -15,7 +16,7 @@ const authRoutes: FastifyPluginAsync = async (fastify) => {
   })
 
   // POST /auth/login — stricter rate limit (5 attempts per minute)
-  fastify.post('/auth/login', { config: { rateLimit } }, async (request, reply) => {
+  fastify.post('/auth/login', { config: { rateLimit: loginRateLimit } }, async (request, reply) => {
     const parsed = loginSchema.safeParse(request.body)
     if (!parsed.success) {
       return reply.code(400).send({ error: 'VALIDATION_ERROR', message: 'Invalid input' })
@@ -69,18 +70,22 @@ const authRoutes: FastifyPluginAsync = async (fastify) => {
   })
 
   // POST /auth/logout
-  fastify.post('/auth/logout', { config: { rateLimit } }, async (_request, reply) => {
-    reply
-      .clearCookie('token', { path: '/' })
-      .clearCookie('refreshToken', { path: '/api/auth/refresh' })
-      .send({ ok: true })
-  })
+  fastify.post(
+    '/auth/logout',
+    { config: { rateLimit: loginRateLimit } },
+    async (_request, reply) => {
+      reply
+        .clearCookie('token', { path: '/' })
+        .clearCookie('refreshToken', { path: '/api/auth/refresh' })
+        .send({ ok: true })
+    }
+  )
 
   // POST /auth/refresh
   fastify.post(
     '/auth/refresh',
     {
-      config: { rateLimit },
+      config: { rateLimit: loginRateLimit },
     },
     async (request, reply) => {
       const refreshToken = request.cookies.refreshToken
@@ -140,26 +145,30 @@ const authRoutes: FastifyPluginAsync = async (fastify) => {
   )
 
   // GET /auth/me
-  fastify.get('/auth/me', { preHandler: fastify.authenticate }, async (request, reply) => {
-    // Fetch full user data from DB (request.user only has JWT payload)
-    const user = await prisma.user.findUnique({
-      where: { id: request.user!.id },
-      select: {
-        id: true,
-        email: true,
-        name: true,
-        role: true,
-        language: true,
-        createdAt: true,
-      },
-    })
+  fastify.get(
+    '/auth/me',
+    { preHandler: fastify.authenticate, config: { rateLimit: authRateLimit } },
+    async (request, reply) => {
+      // Fetch full user data from DB (request.user only has JWT payload)
+      const user = await prisma.user.findUnique({
+        where: { id: request.user!.id },
+        select: {
+          id: true,
+          email: true,
+          name: true,
+          role: true,
+          language: true,
+          createdAt: true,
+        },
+      })
 
-    if (!user) {
-      return reply.code(401).send({ error: 'UNAUTHORIZED', message: 'User not found' })
+      if (!user) {
+        return reply.code(401).send({ error: 'UNAUTHORIZED', message: 'User not found' })
+      }
+
+      reply.send({ user })
     }
-
-    reply.send({ user })
-  })
+  )
 }
 
 export default authRoutes
