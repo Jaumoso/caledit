@@ -1,6 +1,7 @@
 import { FastifyPluginAsync } from 'fastify'
 import { z } from 'zod'
 import { prisma } from '../prisma.js'
+import { generateCoverThumbnail } from '../lib/thumbnails.js'
 
 const updateCoverSchema = z.object({
   coverJson: z.any().optional(),
@@ -61,6 +62,14 @@ const coverRoutes: FastifyPluginAsync = async (fastify) => {
         data,
         select: { id: true, coverJson: true, backCoverJson: true },
       })
+
+      // Generate thumbnail asynchronously via Puppeteer (fire-and-forget)
+      if (parsed.data.coverJson !== undefined) {
+        generateCoverThumbnail(id, 'front').catch(() => {})
+      }
+      if (parsed.data.backCoverJson !== undefined) {
+        generateCoverThumbnail(id, 'back').catch(() => {})
+      }
 
       reply.send({ project })
     }

@@ -121,6 +121,7 @@
     "backCover": "Contraportada",
     "fullA4": "Página A4 completa",
     "customized": "Personalizado",
+    "noDesignYet": "Sin diseño aún",
     "errorUpdatingStatus": "Error al actualizar el estado",
     "statusDraft": "Borrador",
     "statusInProgress": "En curso",
@@ -408,6 +409,15 @@
     "skip": "Omitir",
     "previous": "Anterior",
     "next": "Siguiente"
+  },
+  "weekDays": {
+    "monday": "Lunes",
+    "tuesday": "Martes",
+    "wednesday": "Miércoles",
+    "thursday": "Jueves",
+    "friday": "Viernes",
+    "saturday": "Sábado",
+    "sunday": "Domingo"
   },
   "theme": {
     "light": "Claro",

@@ -114,6 +114,11 @@ export interface CanvasEditorHandle {
   getObjects: () => fabric.FabricObject[]
   getActiveObject: () => fabric.FabricObject | null
   selectObject: (obj: fabric.FabricObject) => void
+  toDataURL: (options?: {
+    format?: 'jpeg' | 'png' | 'webp'
+    quality?: number
+    multiplier?: number
+  }) => string | null
 }
 
 interface CanvasEditorProps {
@@ -499,6 +504,25 @@ const CanvasEditor = forwardRef<CanvasEditorHandle, CanvasEditorProps>(
           if (!canvas) return
           canvas.setActiveObject(obj)
           canvas.renderAll()
+        },
+        toDataURL: (options?: {
+          format?: 'jpeg' | 'png' | 'webp'
+          quality?: number
+          multiplier?: number
+        }) => {
+          const canvas = fabricRef.current
+          if (!canvas) return null
+          // Temporarily deselect so selection handles don't appear in the thumbnail
+          const active = canvas.getActiveObject()
+          if (active) canvas.discardActiveObject()
+          const dataUrl = canvas.toDataURL({
+            format: options?.format ?? 'jpeg',
+            quality: options?.quality ?? 0.7,
+            multiplier: options?.multiplier ?? 0.2,
+          })
+          // Restore selection
+          if (active) canvas.setActiveObject(active)
+          return dataUrl
         },
       }),
       [zoom, canUndo, canRedo, saveHistory, loadHistoryState, onModified, onSelectionChange]

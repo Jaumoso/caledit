@@ -121,6 +121,7 @@
     "backCover": "Back cover",
     "fullA4": "Full A4 page",
     "customized": "Customized",
+    "noDesignYet": "No design yet",
     "errorUpdatingStatus": "Error updating status",
     "statusDraft": "Draft",
     "statusInProgress": "In progress",
@@ -408,6 +409,15 @@
     "skip": "Skip",
     "previous": "Previous",
     "next": "Next"
+  },
+  "weekDays": {
+    "monday": "Monday",
+    "tuesday": "Tuesday",
+    "wednesday": "Wednesday",
+    "thursday": "Thursday",
+    "friday": "Friday",
+    "saturday": "Saturday",
+    "sunday": "Sunday"
   },
   "theme": {
     "light": "Light",

@@ -1,3 +1,5 @@
+import { t } from 'i18next'
+
 export interface GridConfig {
   bgColor: string
   bgOpacity: number
@@ -171,5 +173,21 @@ export function isWeekend(dayNumber: number, year: number, month: number): boole
   return dow === 0 || dow === 6
 }
 
-export const WEEKDAY_HEADERS_MON = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
-export const WEEKDAY_HEADERS_SUN = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
+export const WEEKDAY_HEADERS_MON = [
+  t('weekDays.monday'),
+  t('weekDays.tuesday'),
+  t('weekDays.wednesday'),
+  t('weekDays.thursday'),
+  t('weekDays.friday'),
+  t('weekDays.saturday'),
+  t('weekDays.sunday'),
+]
+export const WEEKDAY_HEADERS_SUN = [
+  t('weekDays.sunday'),
+  t('weekDays.monday'),
+  t('weekDays.tuesday'),
+  t('weekDays.wednesday'),
+  t('weekDays.thursday'),
+  t('weekDays.friday'),
+  t('weekDays.saturday'),
+]

@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useParams, Link, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { ArrowLeft, ClipboardList, FileDown, BookOpen, Book } from 'lucide-react'
+import { ArrowLeft, ClipboardList, FileDown, BookOpen, Book, ImageOff } from 'lucide-react'
 import api from '../lib/api'
 import ApplyTemplateModal from '../components/ApplyTemplateModal'
 import ExportModal from '../components/ExportModal'
@@ -29,18 +29,6 @@ const STATUS_OPTIONS = [
   { value: 'COMPLETED', label: 'project.statusCompleted' },
 ]
 
-function getDaysInMonth(year: number, month: number): number {
-  return new Date(year, month, 0).getDate()
-}
-
-function getFirstDayOfWeek(year: number, month: number, weekStartsOn: string): number {
-  const day = new Date(year, month - 1, 1).getDay() // 0=Sun
-  if (weekStartsOn === 'monday') {
-    return day === 0 ? 6 : day - 1 // 0=Mon
-  }
-  return day // 0=Sun
-}
-
 export default function ProjectPage() {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
@@ -50,12 +38,14 @@ export default function ProjectPage() {
   const [error, setError] = useState<string | null>(null)
   const [showApplyTemplate, setShowApplyTemplate] = useState(false)
   const [showExport, setShowExport] = useState(false)
+  const [thumbVersion, setThumbVersion] = useState(Date.now())
 
   useEffect(() => {
     const fetchProject = async () => {
       try {
         const { data } = await api.get(`/projects/${id}`)
         setProject(data.project)
+        setThumbVersion(Date.now())
       } catch {
         setError(t('project.notFound'))
       } finally {
@@ -102,10 +92,6 @@ export default function ProjectPage() {
   }
 
   const monthNames = t('months', { returnObjects: true }) as string[]
-  const weekdays =
-    project.weekStartsOn === 'monday'
-      ? (t('weekdaysMon', { returnObjects: true }) as string[])
-      : (t('weekdaysSun', { returnObjects: true }) as string[])
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -160,18 +146,31 @@ export default function ProjectPage() {
         {/* Cover (front) */}
         <Link
           to={`/projects/${project.id}/cover/front`}
-          className="bg-surface rounded-lg border border-dashed border-primary-300 p-4 hover:shadow-md transition-shadow flex flex-col items-center justify-center min-h-[14rem]"
+          className="bg-surface rounded-lg border border-dashed border-primary-300 p-4 hover:shadow-md transition-shadow flex flex-col min-h-[14rem]"
         >
-          <span className="text-3xl mb-2">
-            <BookOpen size={20} />
-          </span>
-          <h3 className="font-semibold text-primary-700 text-sm">{t('project.frontCover')}</h3>
-          <p className="text-[10px] text-neutral-400 mt-1">{t('project.fullA4')}</p>
+          <h3 className="font-semibold text-primary-700 text-sm mb-2">{t('project.frontCover')}</h3>
+          <div className="flex-1 flex flex-col items-center justify-center">
+            <img
+              src={`/uploads/thumbs/cover-${project.id}-front.jpg?v=${thumbVersion}`}
+              alt={t('project.frontCover')}
+              className="w-full aspect-[3/4] object-cover rounded bg-neutral-100"
+              onError={(e) => {
+                e.currentTarget.style.display = 'none'
+                e.currentTarget.nextElementSibling?.classList.remove('hidden')
+              }}
+            />
+            <div
+              className="hidden flex-col items-center justify-center text-neutral-400"
+              style={{ aspectRatio: '3/4' }}
+            >
+              <BookOpen size={32} className="mb-2" />
+              <span className="text-xs">{t('project.fullA4')}</span>
+            </div>
+          </div>
         </Link>
 
         {project.months.map((m) => {
-          const daysInMonth = getDaysInMonth(m.year, m.month)
-          const firstDay = getFirstDayOfWeek(m.year, m.month, project.weekStartsOn)
+          const thumbUrl = `/uploads/thumbs/${m.id}.jpg?v=${thumbVersion}`
 
           return (
             <Link
@@ -192,24 +191,26 @@ export default function ProjectPage() {
                   />
                 )}
               </div>
-              {/* Mini calendar */}
-              <div className="grid grid-cols-7 gap-px text-[10px]">
-                {weekdays.map((d) => (
-                  <div key={d} className="text-center font-medium text-neutral-400 pb-1">
-                    {d}
-                  </div>
-                ))}
-                {Array.from({ length: firstDay }, (_, i) => (
-                  <div key={`empty-${i}`} />
-                ))}
-                {Array.from({ length: daysInMonth }, (_, i) => (
-                  <div
-                    key={i + 1}
-                    className="text-center py-0.5 text-neutral-600 rounded hover:bg-primary-50"
-                  >
-                    {i + 1}
-                  </div>
-                ))}
+              {/* Month thumbnail */}
+              {m.isCustomized ? (
+                <img
+                  src={thumbUrl}
+                  alt={monthNames[m.month - 1]}
+                  className="w-full aspect-[3/4] object-cover rounded bg-neutral-100"
+                  onError={(e) => {
+                    // Hide broken image and show placeholder
+                    const target = e.currentTarget
+                    target.style.display = 'none'
+                    target.nextElementSibling?.classList.remove('hidden')
+                  }}
+                />
+              ) : null}
+              <div
+                className={`flex flex-col items-center justify-center text-neutral-400 ${m.isCustomized ? 'hidden' : ''}`}
+                style={{ aspectRatio: '3/4' }}
+              >
+                <ImageOff size={32} className="mb-2" />
+                <span className="text-xs">{t('project.noDesignYet')}</span>
               </div>
             </Link>
           )
@@ -218,13 +219,27 @@ export default function ProjectPage() {
         {/* Back cover */}
         <Link
           to={`/projects/${project.id}/cover/back`}
-          className="bg-surface rounded-lg border border-dashed border-primary-300 p-4 hover:shadow-md transition-shadow flex flex-col items-center justify-center min-h-[14rem]"
+          className="bg-surface rounded-lg border border-dashed border-primary-300 p-4 hover:shadow-md transition-shadow flex flex-col min-h-[14rem]"
         >
-          <span className="text-3xl mb-2">
-            <Book size={20} />
-          </span>
-          <h3 className="font-semibold text-primary-700 text-sm">{t('project.backCover')}</h3>
-          <p className="text-[10px] text-neutral-400 mt-1">{t('project.fullA4')}</p>
+          <h3 className="font-semibold text-primary-700 text-sm mb-2">{t('project.backCover')}</h3>
+          <div className="flex-1 flex flex-col items-center justify-center">
+            <img
+              src={`/uploads/thumbs/cover-${project.id}-back.jpg?v=${thumbVersion}`}
+              alt={t('project.backCover')}
+              className="w-full aspect-[3/4] object-cover rounded bg-neutral-100"
+              onError={(e) => {
+                e.currentTarget.style.display = 'none'
+                e.currentTarget.nextElementSibling?.classList.remove('hidden')
+              }}
+            />
+            <div
+              className="hidden flex-col items-center justify-center text-neutral-400"
+              style={{ aspectRatio: '3/4' }}
+            >
+              <Book size={32} className="mb-2" />
+              <span className="text-xs">{t('project.fullA4')}</span>
+            </div>
+          </div>
         </Link>
       </div>
 

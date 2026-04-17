@@ -2,6 +2,7 @@ import { FastifyPluginAsync } from 'fastify'
 import { z } from 'zod'
 import { prisma } from '../prisma.js'
 import { getSaintsForMonth } from '../data/saints.js'
+import { generateMonthThumbnail } from '../lib/thumbnails.js'
 
 const gridConfigSchema = z.object({
   bgColor: z.string().optional(),
@@ -144,6 +145,11 @@ const monthRoutes: FastifyPluginAsync = async (fastify) => {
         dayCells: { orderBy: { dayNumber: 'asc' } },
       },
     })
+
+    // Generate thumbnail asynchronously via Puppeteer (fire-and-forget)
+    if (hasContent) {
+      generateMonthThumbnail(id, request.user!.id).catch(() => {})
+    }
 
     reply.send({ month })
   })
