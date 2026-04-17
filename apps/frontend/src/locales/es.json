@@ -368,6 +368,8 @@
     "noElements": "No hay elementos en el lienzo",
     "hide": "Ocultar",
     "show": "Mostrar",
+    "lock": "Bloquear",
+    "unlock": "Desbloquear",
     "text": "Texto {{n}}",
     "image": "Imagen {{n}}",
     "rectangle": "Rectángulo {{n}}",

@@ -261,7 +261,7 @@ const CANVAS_HEIGHT = PAGE_HEIGHT
 const MAX_HISTORY = 50
 
 /** Serialize canvas including custom properties (customName, clipMaskType) */
-const EXTRA_PROPS = ['customName', 'clipMaskType']
+const EXTRA_PROPS = ['customName', 'clipMaskType', 'selectable', 'evented']
 function canvasToJSON(canvas: fabric.Canvas) {
   // Fabric.js accepts propertiesToInclude at runtime; TS types don't declare it
   return (canvas as unknown as { toJSON: (p: string[]) => object }).toJSON(EXTRA_PROPS)

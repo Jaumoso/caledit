@@ -339,7 +339,6 @@ La zona de collage (Fase 6) es la más compleja y puede venir después del MVP.
 - Formas básicas (rectángulos, círculos, líneas, flechas)
 - Collage automático: layouts predefinidos para la zona de fotos (1 foto, 2 lado a lado, mosaico…)
 - Sombra y resplandor en objetos (drop shadow, glow)
-- Bloquear objetos para evitar moverlos accidentalmente
 - Multi-selección y agrupar/desagrupar objetos
 - Texto con contorno (stroke) y degradado
 - Copiar/pegar elementos entre meses

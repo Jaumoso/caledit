@@ -2,7 +2,18 @@ import { useState, useEffect, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 import type * as fabric from 'fabric'
 import type { CanvasEditorHandle } from './CanvasEditor'
-import { GripVertical, Eye, EyeOff, Type, Image, Square, Circle, Diamond } from 'lucide-react'
+import {
+  GripVertical,
+  Eye,
+  EyeOff,
+  Lock,
+  Unlock,
+  Type,
+  Image,
+  Square,
+  Circle,
+  Diamond,
+} from 'lucide-react'
 
 interface LayersPanelProps {
   editorRef: React.RefObject<CanvasEditorHandle | null>
@@ -99,6 +110,19 @@ export default function LayersPanel({ editorRef, selectedObject, refreshKey }: L
             <button
               onClick={(e) => {
                 e.stopPropagation()
+                const locked = !isObjectLocked(obj)
+                setObjectLocked(obj, locked)
+                editorRef.current?.getCanvas()?.renderAll()
+                setObjects([...editorRef.current!.getObjects()].reverse())
+              }}
+              className="text-neutral-400 hover:text-neutral-600"
+              title={isObjectLocked(obj) ? t('layers.unlock') : t('layers.lock')}
+            >
+              {isObjectLocked(obj) ? <Lock size={14} /> : <Unlock size={14} />}
+            </button>
+            <button
+              onClick={(e) => {
+                e.stopPropagation()
                 obj.set('visible', !obj.visible)
                 editorRef.current?.getCanvas()?.renderAll()
                 setObjects([...editorRef.current!.getObjects()].reverse())
@@ -139,4 +163,21 @@ function getObjectIcon(obj: fabric.FabricObject): React.ReactNode {
   if (obj.type === 'rect') return <Square size={14} />
   if (obj.type === 'circle') return <Circle size={14} />
   return <Diamond size={14} />
+}
+
+function isObjectLocked(obj: fabric.FabricObject): boolean {
+  return !!obj.lockMovementX && !!obj.lockMovementY
+}
+
+function setObjectLocked(obj: fabric.FabricObject, locked: boolean): void {
+  obj.set({
+    lockMovementX: locked,
+    lockMovementY: locked,
+    lockRotation: locked,
+    lockScalingX: locked,
+    lockScalingY: locked,
+    hasControls: !locked,
+    selectable: !locked,
+    evented: !locked,
+  })
 }

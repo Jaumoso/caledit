@@ -368,6 +368,8 @@
     "noElements": "No elements on the canvas",
     "hide": "Hide",
     "show": "Show",
+    "lock": "Lock",
+    "unlock": "Unlock",
     "text": "Text {{n}}",
     "image": "Image {{n}}",
     "rectangle": "Rectangle {{n}}",
