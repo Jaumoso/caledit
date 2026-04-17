@@ -52,6 +52,8 @@ export default function MonthEditorPage() {
 
   const dirtyRef = useRef(false)
   const gridConfigRef = useRef(gridConfig)
+  // Track which monthId was last loaded into the canvas to avoid loading stale data
+  const loadedMonthIdRef = useRef<string | null>(null)
 
   // Keep refs in sync
   useEffect(() => {
@@ -61,28 +63,63 @@ export default function MonthEditorPage() {
 
   // Fetch month data
   useEffect(() => {
+    let cancelled = false
     const fetchMonth = async () => {
+      setSelectedObject(null)
       try {
         const { data } = await api.get(`/months/${monthId}`)
+        if (cancelled) return
         setMonthData(data.month)
         if (data.month.gridConfigJson) {
           setGridConfig({ ...DEFAULT_GRID_CONFIG, ...data.month.gridConfigJson })
+        } else {
+          setGridConfig(DEFAULT_GRID_CONFIG)
         }
-        if (data.month.canvasTopJson) {
-          canvasTopJsonRef.current = data.month.canvasTopJson as object
-        }
+        canvasTopJsonRef.current = data.month.canvasTopJson as object | null
         setDayCells(data.month.dayCells || [])
         setHolidays(data.holidays || [])
         setEvents(data.events || [])
         setSaints(data.saints || [])
+        setDirty(false)
+        setLastSaved(null)
+        setError(null)
+
+        // Load canvas immediately after data arrives — canvas stays mounted
+        const editor = canvasEditorRef.current
+        if (editor) {
+          const json = data.month.canvasTopJson ?? { objects: [], backgroundColor: '#ffffff' }
+          await editor.loadFromJSON(json as object)
+          if (cancelled) return
+          loadedMonthIdRef.current = monthId!
+          setSelectedObject(null)
+          setCanvasRefreshKey((k) => k + 1)
+          setDirty(false)
+        }
       } catch {
-        setError(t('editor.errorLoading'))
+        if (!cancelled) setError(t('editor.errorLoading'))
       } finally {
-        setLoading(false)
+        if (!cancelled) setLoading(false)
       }
     }
     fetchMonth()
+    return () => {
+      cancelled = true
+    }
   }, [monthId])
+
+  // Handle initial mount: if data arrived before CanvasEditor mounted (first load),
+  // the fetch effect couldn't call loadFromJSON. Load now that the canvas exists.
+  const handleCanvasReady = useCallback(() => {
+    if (loadedMonthIdRef.current === monthId || !monthData) return
+    const editor = canvasEditorRef.current
+    if (!editor) return
+    const json = canvasTopJsonRef.current ?? { objects: [], backgroundColor: '#ffffff' }
+    editor.loadFromJSON(json).then(() => {
+      loadedMonthIdRef.current = monthId!
+      setCanvasRefreshKey((k) => k + 1)
+      setDirty(false)
+    })
+  }, [monthId, monthData])
 
   // Save function
   const save = useCallback(async () => {
@@ -90,6 +127,8 @@ export default function MonthEditorPage() {
     setSaving(true)
     try {
       const canvasJson = canvasEditorRef.current?.toJSON() ?? canvasTopJsonRef.current
+      // Keep ref in sync so unmount save always has latest state
+      if (canvasJson) canvasTopJsonRef.current = canvasJson
       await api.put(`/months/${monthId}`, {
         gridConfigJson: gridConfigRef.current,
         canvasTopJson: canvasJson,
@@ -116,6 +155,7 @@ export default function MonthEditorPage() {
     return () => {
       if (dirtyRef.current) {
         const canvasJson = canvasEditorRef.current?.toJSON() ?? canvasTopJsonRef.current
+        if (canvasJson) canvasTopJsonRef.current = canvasJson
         // Fire and forget
         api
           .put(`/months/${monthId}`, {
@@ -154,6 +194,9 @@ export default function MonthEditorPage() {
   const handleCanvasModified = useCallback(() => {
     setDirty(true)
     setCanvasRefreshKey((k) => k + 1)
+    // Keep ref in sync so fallback save always has latest canvas state
+    const json = canvasEditorRef.current?.toJSON()
+    if (json) canvasTopJsonRef.current = json
   }, [])
 
   const handleSelectionChange = useCallback((obj: import('fabric').FabricObject | null) => {
@@ -382,9 +425,9 @@ export default function MonthEditorPage() {
                   ref={canvasEditorRef}
                   width={PAGE_WIDTH}
                   height={PAGE_HEIGHT}
-                  initialJson={canvasTopJsonRef.current}
                   onModified={handleCanvasModified}
                   onSelectionChange={handleSelectionChange}
+                  onReady={handleCanvasReady}
                 />
               </div>
 

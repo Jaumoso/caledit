@@ -46,6 +46,7 @@ export default function CoverEditorPage() {
   const [bgAssetMode, setBgAssetMode] = useState(false)
 
   const dirtyRef = useRef(false)
+  const loadedKeyRef = useRef<string | null>(null)
 
   useEffect(() => {
     dirtyRef.current = dirty
@@ -53,20 +54,52 @@ export default function CoverEditorPage() {
 
   // Fetch cover data
   useEffect(() => {
+    let cancelled = false
     const fetchCover = async () => {
+      setSelectedObject(null)
       try {
         const { data } = await api.get(`/projects/${projectId}/covers`)
+        if (cancelled) return
         setCoverData(data.project)
         const json = isFront ? data.project.coverJson : data.project.backCoverJson
-        if (json) canvasJsonRef.current = json as object
+        canvasJsonRef.current = json ? (json as object) : null
+
+        // Load canvas immediately — canvas stays mounted
+        const editor = canvasEditorRef.current
+        if (editor) {
+          await editor.loadFromJSON(
+            canvasJsonRef.current ?? { objects: [], backgroundColor: '#ffffff' }
+          )
+          if (cancelled) return
+          loadedKeyRef.current = `${projectId}-${isFront}`
+          setSelectedObject(null)
+          setDirty(false)
+        }
       } catch {
-        setError(t('cover.errorLoading'))
+        if (!cancelled) setError(t('cover.errorLoading'))
       } finally {
-        setLoading(false)
+        if (!cancelled) setLoading(false)
       }
     }
     fetchCover()
+    return () => {
+      cancelled = true
+    }
   }, [projectId, isFront])
+
+  // Handle initial mount: if data arrived before CanvasEditor mounted (first load),
+  // the fetch effect couldn't call loadFromJSON. Load now that the canvas exists.
+  const handleCanvasReady = useCallback(() => {
+    const key = `${projectId}-${isFront}`
+    if (loadedKeyRef.current === key || !coverData) return
+    const editor = canvasEditorRef.current
+    if (!editor) return
+    const json = canvasJsonRef.current ?? { objects: [], backgroundColor: '#ffffff' }
+    editor.loadFromJSON(json).then(() => {
+      loadedKeyRef.current = key
+      setDirty(false)
+    })
+  }, [projectId, isFront, coverData])
 
   // Save function
   const save = useCallback(async () => {
@@ -74,6 +107,7 @@ export default function CoverEditorPage() {
     setSaving(true)
     try {
       const canvasJson = canvasEditorRef.current?.toJSON() ?? canvasJsonRef.current
+      if (canvasJson) canvasJsonRef.current = canvasJson
       const body = isFront ? { coverJson: canvasJson } : { backCoverJson: canvasJson }
       await api.put(`/projects/${projectId}/covers`, body)
       setLastSaved(new Date())
@@ -98,6 +132,7 @@ export default function CoverEditorPage() {
     return () => {
       if (dirtyRef.current && projectId) {
         const canvasJson = canvasEditorRef.current?.toJSON() ?? canvasJsonRef.current
+        if (canvasJson) canvasJsonRef.current = canvasJson
         const body = isFront ? { coverJson: canvasJson } : { backCoverJson: canvasJson }
         api.put(`/projects/${projectId}/covers`, body).catch(() => {})
       }
@@ -107,6 +142,8 @@ export default function CoverEditorPage() {
   const handleCanvasModified = useCallback(() => {
     setDirty(true)
     setCanvasRefreshKey((k) => k + 1)
+    const json = canvasEditorRef.current?.toJSON()
+    if (json) canvasJsonRef.current = json
   }, [])
 
   const handleSelectionChange = useCallback((obj: import('fabric').FabricObject | null) => {
@@ -227,9 +264,9 @@ export default function CoverEditorPage() {
                 ref={canvasEditorRef}
                 width={PAGE_WIDTH}
                 height={PAGE_HEIGHT}
-                initialJson={canvasJsonRef.current}
                 onModified={handleCanvasModified}
                 onSelectionChange={handleSelectionChange}
+                onReady={handleCanvasReady}
               />
             </div>
           </div>

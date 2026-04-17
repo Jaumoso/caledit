@@ -2,6 +2,93 @@ import { useEffect, useRef, useState, useCallback, forwardRef, useImperativeHand
 import * as fabric from 'fabric'
 import { PAGE_WIDTH, PAGE_HEIGHT } from '../lib/calendarTypes'
 
+/**
+ * Normalize image `src` in canvas JSON to relative paths.
+ * Fabric.js stores the resolved absolute URL (e.g. http://localhost:5173/uploads/file.jpg)
+ * which breaks if the origin changes. Convert back to relative /uploads/… paths.
+ */
+function normalizeCanvasJson(json: Record<string, unknown>): Record<string, unknown> {
+  const origin = window.location.origin
+  const fixSrc = (obj: Record<string, unknown>) => {
+    if (typeof obj.src === 'string' && obj.src.startsWith(origin)) {
+      obj.src = obj.src.slice(origin.length)
+    }
+  }
+  if (Array.isArray(json.objects)) {
+    for (const obj of json.objects) {
+      fixSrc(obj as Record<string, unknown>)
+    }
+  }
+  if (json.backgroundImage && typeof json.backgroundImage === 'object') {
+    fixSrc(json.backgroundImage as Record<string, unknown>)
+  }
+  return json
+}
+
+/**
+ * Load canvas from JSON with per-object error tolerance.
+ * If an image fails to load, other objects are still restored.
+ */
+async function safeLoadFromJSON(canvas: fabric.Canvas, json: object): Promise<void> {
+  const parsed = typeof json === 'string' ? JSON.parse(json) : json
+  const {
+    objects = [],
+    backgroundImage: bgImageData,
+    overlayImage: overlayImageData,
+    ...canvasProps
+  } = parsed as Record<string, unknown> & {
+    objects?: Record<string, unknown>[]
+    backgroundImage?: unknown
+    overlayImage?: unknown
+  }
+
+  // Load objects one-by-one so a single image failure doesn't kill everything
+  const loaded: fabric.FabricObject[] = []
+  for (const objData of objects) {
+    try {
+      const klass = fabric.classRegistry.getClass(objData.type as string)
+      const instance = await (
+        klass as { fromObject: (d: unknown) => Promise<fabric.FabricObject> }
+      ).fromObject(objData)
+      loaded.push(instance)
+    } catch (err) {
+      console.warn('[CanvasEditor] Failed to restore object, skipping:', objData.type, err)
+    }
+  }
+
+  // Deserialize background/overlay images into real FabricImage instances
+  const bgProps: Record<string, unknown> = {}
+  const bgEntries: Array<[string, unknown]> = [
+    ['backgroundImage', bgImageData],
+    ['overlayImage', overlayImageData],
+  ]
+  for (const [key, data] of bgEntries) {
+    if (data && typeof data === 'object') {
+      try {
+        const klass = fabric.classRegistry.getClass(
+          (data as Record<string, unknown>).type as string
+        )
+        bgProps[key] = await (
+          klass as { fromObject: (d: unknown) => Promise<fabric.FabricObject> }
+        ).fromObject(data)
+      } catch (err) {
+        console.warn(`[CanvasEditor] Failed to restore ${key}, skipping:`, err)
+      }
+    }
+  }
+
+  const renderOnAddRemove = canvas.renderOnAddRemove
+  canvas.renderOnAddRemove = false
+  canvas.clear()
+  if (loaded.length) canvas.add(...loaded)
+  // Set canvas props WITHOUT backgroundImage/overlayImage (those were extracted above)
+  canvas.set(canvasProps)
+  // Set deserialized FabricImage instances for bg/overlay
+  canvas.set(bgProps)
+  canvas.renderOnAddRemove = renderOnAddRemove
+  canvas.renderAll()
+}
+
 export interface CanvasEditorHandle {
   getCanvas: () => fabric.Canvas | null
   toJSON: () => object | null
@@ -32,9 +119,9 @@ export interface CanvasEditorHandle {
 interface CanvasEditorProps {
   width?: number
   height?: number
-  initialJson?: object | null
   onModified?: () => void
   onSelectionChange?: (obj: fabric.FabricObject | null) => void
+  onReady?: () => void
 }
 
 const CANVAS_WIDTH = PAGE_WIDTH
@@ -44,7 +131,7 @@ const MAX_HISTORY = 50
 
 const CanvasEditor = forwardRef<CanvasEditorHandle, CanvasEditorProps>(
   (
-    { width = CANVAS_WIDTH, height = CANVAS_HEIGHT, initialJson, onModified, onSelectionChange },
+    { width = CANVAS_WIDTH, height = CANVAS_HEIGHT, onModified, onSelectionChange, onReady },
     ref
   ) => {
     const wrapperRef = useRef<HTMLDivElement>(null)
@@ -52,7 +139,6 @@ const CanvasEditor = forwardRef<CanvasEditorHandle, CanvasEditorProps>(
     const historyRef = useRef<string[]>([])
     const historyIndexRef = useRef(-1)
     const isLoadingRef = useRef(false)
-    const initialLoadRef = useRef(false)
     const [zoom, setZoom] = useState(1)
     const [canUndo, setCanUndo] = useState(false)
     const [canRedo, setCanRedo] = useState(false)
@@ -115,7 +201,7 @@ const CanvasEditor = forwardRef<CanvasEditorHandle, CanvasEditorProps>(
 
       // Events
       const handleModified = () => {
-        if (disposed) return
+        if (disposed || isLoadingRef.current) return
         saveHistory()
         onModified?.()
       }
@@ -136,25 +222,13 @@ const CanvasEditor = forwardRef<CanvasEditorHandle, CanvasEditorProps>(
         onSelectionChange?.(null)
       })
 
-      // Load initial JSON if present
-      if (initialJson && !initialLoadRef.current) {
-        initialLoadRef.current = true
-        isLoadingRef.current = true
-        canvas.loadFromJSON(JSON.stringify(initialJson)).then(() => {
-          if (disposed) return
-          canvas.renderAll()
-          isLoadingRef.current = false
-          const jsonStr = JSON.stringify(canvas.toJSON())
-          historyRef.current = [jsonStr]
-          historyIndexRef.current = 0
-          setCanUndo(false)
-          setCanRedo(false)
-        })
-      } else {
-        const jsonStr = JSON.stringify(canvas.toJSON())
-        historyRef.current = [jsonStr]
-        historyIndexRef.current = 0
-      }
+      // Start with empty canvas — data will be loaded via loadFromJSON after fetch
+      const jsonStr = JSON.stringify(canvas.toJSON())
+      historyRef.current = [jsonStr]
+      historyIndexRef.current = 0
+
+      // Notify parent that the canvas is ready to receive loadFromJSON calls
+      onReady?.()
 
       return () => {
         disposed = true
@@ -226,16 +300,28 @@ const CanvasEditor = forwardRef<CanvasEditorHandle, CanvasEditorProps>(
         getCanvas: () => fabricRef.current,
         toJSON: () => {
           if (!fabricRef.current) return null
-          return fabricRef.current.toJSON()
+          const json = fabricRef.current.toJSON() as Record<string, unknown>
+          return normalizeCanvasJson(json)
         },
         loadFromJSON: async (json: object) => {
           const canvas = fabricRef.current
           if (!canvas) return
           isLoadingRef.current = true
-          await canvas.loadFromJSON(JSON.stringify(json))
-          canvas.renderAll()
+          canvas.discardActiveObject()
+          await safeLoadFromJSON(canvas, json)
           isLoadingRef.current = false
-          saveHistory()
+          // Reset history for the newly loaded state
+          try {
+            const jsonStr = JSON.stringify(canvas.toJSON())
+            historyRef.current = [jsonStr]
+            historyIndexRef.current = 0
+          } catch (err) {
+            console.warn('[CanvasEditor] Failed to snapshot history after load:', err)
+            historyRef.current = []
+            historyIndexRef.current = -1
+          }
+          setCanUndo(false)
+          setCanRedo(false)
         },
         addImageFromURL: async (url: string, name?: string) => {
           const canvas = fabricRef.current
