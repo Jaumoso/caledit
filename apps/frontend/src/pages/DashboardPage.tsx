@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router-dom'
 import api from '../lib/api'
 import NewProjectModal from '../components/NewProjectModal'
@@ -21,12 +22,13 @@ interface Project {
 }
 
 const STATUS_LABELS: Record<string, { label: string; color: string }> = {
-  DRAFT: { label: 'Draft', color: 'bg-neutral-200 text-neutral-700' },
-  IN_PROGRESS: { label: 'In progress', color: 'bg-blue-100 text-blue-700' },
-  COMPLETED: { label: 'Completed', color: 'bg-green-100 text-green-700' },
+  DRAFT: { label: 'dashboard.statusDraft', color: 'bg-neutral-200 text-neutral-700' },
+  IN_PROGRESS: { label: 'dashboard.statusInProgress', color: 'bg-blue-100 text-blue-700' },
+  COMPLETED: { label: 'dashboard.statusCompleted', color: 'bg-green-100 text-green-700' },
 }
 
 export default function DashboardPage() {
+  const { t } = useTranslation()
   const [projects, setProjects] = useState<Project[]>([])
   const [loading, setLoading] = useState(true)
   const [showModal, setShowModal] = useState(false)
@@ -37,7 +39,7 @@ export default function DashboardPage() {
       const { data } = await api.get('/projects')
       setProjects(data.projects)
     } catch {
-      setError('Error loading projects')
+      setError(t('dashboard.errorLoading'))
     } finally {
       setLoading(false)
     }
@@ -52,17 +54,17 @@ export default function DashboardPage() {
       await api.post(`/projects/${id}/duplicate`)
       fetchProjects()
     } catch {
-      setError('Error duplicating project')
+      setError(t('dashboard.errorDuplicating'))
     }
   }
 
   const handleDelete = async (id: string, name: string) => {
-    if (!confirm(`Delete "${name}"? This action cannot be undone.`)) return
+    if (!confirm(t('dashboard.confirmDelete', { name }))) return
     try {
       await api.delete(`/projects/${id}`)
       setProjects((prev) => prev.filter((p) => p.id !== id))
     } catch {
-      setError('Error deleting project')
+      setError(t('dashboard.errorDeleting'))
     }
   }
 
@@ -84,13 +86,13 @@ export default function DashboardPage() {
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold text-neutral-900">My calendars</h1>
+        <h1 className="text-2xl font-bold text-neutral-900">{t('dashboard.title')}</h1>
         <button
           onClick={() => setShowModal(true)}
           className="btn btn-primary flex items-center gap-2"
         >
           <span className="text-lg leading-none">+</span>
-          New calendar
+          {t('dashboard.newCalendar')}
         </button>
       </div>
 
@@ -98,7 +100,7 @@ export default function DashboardPage() {
         <div className="mb-4 p-3 bg-red-50 text-red-700 rounded-lg text-sm">
           {error}
           <button onClick={() => setError(null)} className="ml-2 underline">
-            Close
+            {t('common.close')}
           </button>
         </div>
       )}
@@ -106,12 +108,12 @@ export default function DashboardPage() {
       {projects.length === 0 ? (
         <div className="text-center py-16">
           <div className="text-5xl mb-4">📅</div>
-          <h2 className="text-lg font-semibold text-neutral-700 mb-2">No calendars yet</h2>
-          <p className="text-neutral-500 mb-6">
-            Create your first custom calendar to start designing.
-          </p>
+          <h2 className="text-lg font-semibold text-neutral-700 mb-2">
+            {t('dashboard.noCalendars')}
+          </h2>
+          <p className="text-neutral-500 mb-6">{t('dashboard.noCalendarsDesc')}</p>
           <button onClick={() => setShowModal(true)} className="btn btn-primary">
-            Create my first calendar
+            {t('dashboard.createFirst')}
           </button>
         </div>
       ) : (
@@ -133,7 +135,7 @@ export default function DashboardPage() {
                     <span
                       className={`text-xs px-2 py-0.5 rounded-full font-medium ${status.color}`}
                     >
-                      {status.label}
+                      {t(status.label)}
                     </span>
                   </div>
                   {/* Mini month grid */}
@@ -154,7 +156,9 @@ export default function DashboardPage() {
                       </div>
                     ))}
                   </div>
-                  <p className="text-xs text-neutral-400">{customized}/12 months customized</p>
+                  <p className="text-xs text-neutral-400">
+                    {t('dashboard.monthsCustomized', { count: customized })}
+                  </p>
                 </Link>
                 <div className="border-t border-neutral-100 px-5 py-2 flex gap-2 justify-end">
                   <button
@@ -163,9 +167,9 @@ export default function DashboardPage() {
                       handleDuplicate(project.id)
                     }}
                     className="text-xs text-neutral-500 hover:text-primary-600 transition-colors"
-                    title="Duplicate"
+                    title={t('common.duplicate')}
                   >
-                    Duplicate
+                    {t('common.duplicate')}
                   </button>
                   <button
                     onClick={(e) => {
@@ -173,9 +177,9 @@ export default function DashboardPage() {
                       handleDelete(project.id, project.name)
                     }}
                     className="text-xs text-neutral-500 hover:text-red-600 transition-colors"
-                    title="Delete"
+                    title={t('common.delete')}
                   >
-                    Delete
+                    {t('common.delete')}
                   </button>
                 </div>
               </div>

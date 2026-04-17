@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { useTranslation } from 'react-i18next'
 import type * as fabric from 'fabric'
 import type { CanvasEditorHandle } from './CanvasEditor'
 
@@ -9,6 +10,7 @@ interface LayersPanelProps {
 }
 
 export default function LayersPanel({ editorRef, selectedObject, refreshKey }: LayersPanelProps) {
+  const { t } = useTranslation()
   const [objects, setObjects] = useState<fabric.FabricObject[]>([])
 
   useEffect(() => {
@@ -18,17 +20,17 @@ export default function LayersPanel({ editorRef, selectedObject, refreshKey }: L
   }, [editorRef, selectedObject, refreshKey])
 
   if (objects.length === 0) {
-    return (
-      <div className="text-xs text-neutral-400 text-center py-4">No elements on the canvas</div>
-    )
+    return <div className="text-xs text-neutral-400 text-center py-4">{t('layers.noElements')}</div>
   }
 
   return (
     <div className="space-y-1">
-      <h3 className="text-xs font-semibold text-neutral-500 uppercase tracking-wide mb-2">Capas</h3>
+      <h3 className="text-xs font-semibold text-neutral-500 uppercase tracking-wide mb-2">
+        {t('layers.title')}
+      </h3>
       {objects.map((obj, i) => {
         const isActive = selectedObject === obj
-        const name = getObjectName(obj, objects.length - i)
+        const name = getObjectName(obj, objects.length - i, t)
         return (
           <div
             key={`layer-${objects.length - i}`}
@@ -51,7 +53,7 @@ export default function LayersPanel({ editorRef, selectedObject, refreshKey }: L
                 setObjects([...editorRef.current!.getObjects()].reverse())
               }}
               className="text-neutral-400 hover:text-neutral-600"
-              title={obj.visible !== false ? 'Ocultar' : 'Mostrar'}
+              title={obj.visible !== false ? t('layers.hide') : t('layers.show')}
             >
               {obj.visible !== false ? '👁' : '👁‍🗨'}
             </button>
@@ -62,17 +64,21 @@ export default function LayersPanel({ editorRef, selectedObject, refreshKey }: L
   )
 }
 
-function getObjectName(obj: fabric.FabricObject, layerNum: number): string {
+function getObjectName(
+  obj: fabric.FabricObject,
+  layerNum: number,
+  t: (key: string, opts?: Record<string, unknown>) => string
+): string {
   const custom = (obj as fabric.FabricObject & { customName?: string }).customName
   if (custom) return custom
   if (obj.type === 'i-text' || obj.type === 'text' || obj.type === 'textbox') {
     const text = (obj as fabric.IText).text || ''
-    return text.length > 20 ? text.slice(0, 20) + '...' : text || `Text ${layerNum}`
+    return text.length > 20 ? text.slice(0, 20) + '...' : text || t('layers.text', { n: layerNum })
   }
-  if (obj.type === 'image') return `Image ${layerNum}`
-  if (obj.type === 'rect') return `Rectangle ${layerNum}`
-  if (obj.type === 'circle') return `Circle ${layerNum}`
-  return `Element ${layerNum}`
+  if (obj.type === 'image') return t('layers.image', { n: layerNum })
+  if (obj.type === 'rect') return t('layers.rectangle', { n: layerNum })
+  if (obj.type === 'circle') return t('layers.circle', { n: layerNum })
+  return t('layers.element', { n: layerNum })
 }
 
 function getObjectIcon(obj: fabric.FabricObject): string {

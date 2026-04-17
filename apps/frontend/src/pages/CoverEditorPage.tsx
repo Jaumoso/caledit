@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
+import { useTranslation } from 'react-i18next'
 import { useParams, useNavigate, Link } from 'react-router-dom'
 import api from '../lib/api'
 import { PAGE_WIDTH, PAGE_HEIGHT } from '../lib/calendarTypes'
@@ -23,8 +24,9 @@ interface CoverData {
 export default function CoverEditorPage() {
   const { projectId, type } = useParams<{ projectId: string; type: string }>()
   const navigate = useNavigate()
+  const { t } = useTranslation()
   const isFront = type !== 'back'
-  const label = isFront ? 'Portada' : 'Contraportada'
+  const label = isFront ? t('cover.frontCover') : t('cover.backCover')
 
   const [coverData, setCoverData] = useState<CoverData | null>(null)
   const [loading, setLoading] = useState(true)
@@ -57,7 +59,7 @@ export default function CoverEditorPage() {
         const json = isFront ? data.project.coverJson : data.project.backCoverJson
         if (json) canvasJsonRef.current = json as object
       } catch {
-        setError('No se pudo cargar')
+        setError(t('cover.errorLoading'))
       } finally {
         setLoading(false)
       }
@@ -76,7 +78,7 @@ export default function CoverEditorPage() {
       setLastSaved(new Date())
       setDirty(false)
     } catch {
-      setError('Error al guardar')
+      setError(t('cover.errorSaving'))
     } finally {
       setSaving(false)
     }
@@ -141,7 +143,7 @@ export default function CoverEditorPage() {
       <div className="flex flex-col items-center justify-center h-[calc(100vh-3.5rem)] gap-4">
         <p className="text-neutral-600">{error}</p>
         <Link to={`/projects/${projectId}`} className="text-primary-600 hover:underline">
-          Volver al proyecto
+          {t('cover.backToProject')}
         </Link>
       </div>
     )
@@ -156,7 +158,7 @@ export default function CoverEditorPage() {
             to={`/projects/${projectId}`}
             className="text-neutral-400 hover:text-neutral-600 transition-colors text-sm"
           >
-            ← Proyecto
+            {t('editor.backToProject')}
           </Link>
           <div className="flex items-center gap-2">
             <button
@@ -166,7 +168,7 @@ export default function CoverEditorPage() {
                 })
               }
               className="text-neutral-400 hover:text-neutral-700 transition-colors"
-              title={isFront ? 'Ir a contraportada' : 'Ir a portada'}
+              title={isFront ? t('cover.goToBack') : t('cover.goToFront')}
             >
               {isFront ? '▶' : '◀'}
             </button>
@@ -179,17 +181,19 @@ export default function CoverEditorPage() {
           {error && <span className="text-xs text-red-500">{error}</span>}
           {lastSaved && (
             <span className="text-xs text-neutral-400">
-              Guardado:{' '}
-              {lastSaved.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })}
+              {t('common.saved') + ' '}
+              {lastSaved.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' })}
             </span>
           )}
-          {dirty && !saving && <span className="text-xs text-amber-500">Sin guardar</span>}
+          {dirty && !saving && (
+            <span className="text-xs text-amber-500">{t('common.unsaved')}</span>
+          )}
           <button
             onClick={save}
             disabled={saving || !dirty}
             className="btn btn-primary text-sm disabled:opacity-50"
           >
-            {saving ? 'Guardando...' : 'Guardar'}
+            {saving ? t('common.saving') : t('common.save')}
           </button>
         </div>
       </div>
@@ -197,7 +201,7 @@ export default function CoverEditorPage() {
       {/* Canvas toolbar */}
       <div className="bg-white border-b border-neutral-200 px-4 py-1.5 flex items-center gap-2 shrink-0">
         <span className="text-xs font-medium text-neutral-500 mr-2">
-          {isFront ? '📖 Portada' : '📘 Contraportada'}
+          {isFront ? t('cover.frontLabel') : t('cover.backLabel')}
         </span>
         <div className="flex-1">
           <CanvasToolbar

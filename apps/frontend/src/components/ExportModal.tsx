@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
+import { useTranslation } from 'react-i18next'
 import api from '../lib/api'
 
 interface ExportJob {
@@ -21,6 +22,7 @@ interface Props {
 }
 
 export default function ExportModal({ projectId, projectName, projectYear, onClose }: Props) {
+  const { t } = useTranslation()
   const [format, setFormat] = useState<'PDF' | 'PNG'>('PDF')
   const [dpi, setDpi] = useState(300)
   const [bindingGuide, setBindingGuide] = useState(false)
@@ -75,7 +77,7 @@ export default function ExportModal({ projectId, projectName, projectYear, onClo
         err && typeof err === 'object' && 'response' in err
           ? (err as { response?: { data?: { message?: string } } }).response?.data?.message
           : undefined
-      setError(msg || 'Error starting export')
+      setError(msg || t('exportModal.errorStarting'))
     } finally {
       setStarting(false)
     }
@@ -101,7 +103,7 @@ export default function ExportModal({ projectId, projectName, projectYear, onClo
       <div className="bg-white rounded-xl shadow-xl w-full max-w-md mx-4 overflow-hidden">
         {/* Header */}
         <div className="flex items-center justify-between px-5 py-4 border-b border-neutral-200">
-          <h2 className="text-lg font-bold text-neutral-900">📄 Export calendar</h2>
+          <h2 className="text-lg font-bold text-neutral-900">{t('exportModal.title')}</h2>
           <button
             onClick={onClose}
             disabled={!!isRunning}
@@ -117,7 +119,9 @@ export default function ExportModal({ projectId, projectName, projectYear, onClo
             <>
               {/* Format */}
               <div>
-                <p className="text-sm font-medium text-neutral-700 mb-2">Format</p>
+                <p className="text-sm font-medium text-neutral-700 mb-2">
+                  {t('exportModal.format')}
+                </p>
                 <div className="flex gap-3">
                   <button
                     onClick={() => setFormat('PDF')}
@@ -127,10 +131,10 @@ export default function ExportModal({ projectId, projectName, projectYear, onClo
                         : 'border-neutral-200 text-neutral-600 hover:border-neutral-300'
                     }`}
                   >
-                    📕 PDF
+                    {t('exportModal.pdfLabel')}
                     <br />
                     <span className="text-xs font-normal opacity-70">
-                      Multi-page, ready to print
+                      {t('exportModal.pdfDesc')}
                     </span>
                   </button>
                   <button
@@ -141,16 +145,20 @@ export default function ExportModal({ projectId, projectName, projectYear, onClo
                         : 'border-neutral-200 text-neutral-600 hover:border-neutral-300'
                     }`}
                   >
-                    🖼️ PNG
+                    {t('exportModal.pngLabel')}
                     <br />
-                    <span className="text-xs font-normal opacity-70">Individual images (ZIP)</span>
+                    <span className="text-xs font-normal opacity-70">
+                      {t('exportModal.pngDesc')}
+                    </span>
                   </button>
                 </div>
               </div>
 
               {/* DPI */}
               <div>
-                <p className="text-sm font-medium text-neutral-700 mb-2">Quality (DPI)</p>
+                <p className="text-sm font-medium text-neutral-700 mb-2">
+                  {t('exportModal.quality')}
+                </p>
                 <div className="flex gap-2">
                   {[150, 300, 600].map((d) => (
                     <button
@@ -163,10 +171,20 @@ export default function ExportModal({ projectId, projectName, projectYear, onClo
                       }`}
                     >
                       {d} DPI
-                      {d === 150 && <span className="block text-[10px] opacity-70">Draft</span>}
-                      {d === 300 && <span className="block text-[10px] opacity-70">Print</span>}
+                      {d === 150 && (
+                        <span className="block text-[10px] opacity-70">
+                          {t('exportModal.dpiDraft')}
+                        </span>
+                      )}
+                      {d === 300 && (
+                        <span className="block text-[10px] opacity-70">
+                          {t('exportModal.dpiPrint')}
+                        </span>
+                      )}
                       {d === 600 && (
-                        <span className="block text-[10px] opacity-70">High quality</span>
+                        <span className="block text-[10px] opacity-70">
+                          {t('exportModal.dpiHigh')}
+                        </span>
                       )}
                     </button>
                   ))}
@@ -182,20 +200,22 @@ export default function ExportModal({ projectId, projectName, projectYear, onClo
                     onChange={(e) => setBindingGuide(e.target.checked)}
                     className="w-4 h-4 rounded border-neutral-300 text-primary-600 focus:ring-primary-500"
                   />
-                  <span className="text-sm text-neutral-700">Binding guide (center line)</span>
+                  <span className="text-sm text-neutral-700">{t('exportModal.bindingGuide')}</span>
                 </label>
               )}
 
               {/* Filename */}
               <div>
-                <p className="text-sm font-medium text-neutral-700 mb-1">Filename</p>
+                <p className="text-sm font-medium text-neutral-700 mb-1">
+                  {t('exportModal.filename')}
+                </p>
                 <div className="flex items-center gap-1">
                   <input
                     type="text"
                     value={filename}
                     onChange={(e) => setFilename(e.target.value)}
                     className="flex-1 text-sm border border-neutral-300 rounded-md px-3 py-1.5 focus:ring-2 focus:ring-primary-500 outline-none"
-                    placeholder="My calendar"
+                    placeholder={t('exportModal.filenamePlaceholder')}
                   />
                   <span className="text-sm text-neutral-400">
                     .{format === 'PDF' ? 'pdf' : 'zip'}
@@ -215,12 +235,15 @@ export default function ExportModal({ projectId, projectName, projectYear, onClo
               {/* Status */}
               <div className="text-center">
                 {job.status === 'PENDING' && (
-                  <p className="text-neutral-600">⏳ Preparing export...</p>
+                  <p className="text-neutral-600">{t('exportModal.preparing')}</p>
                 )}
                 {job.status === 'PROCESSING' && (
                   <>
                     <p className="text-neutral-600 mb-2">
-                      🔄 Rendering page {job.currentPage} of {job.totalPages}...
+                      {t('exportModal.rendering', {
+                        current: job.currentPage,
+                        total: job.totalPages,
+                      })}
                     </p>
                     <div className="w-full bg-neutral-200 rounded-full h-3">
                       <div
@@ -233,23 +256,25 @@ export default function ExportModal({ projectId, projectName, projectYear, onClo
                 )}
                 {job.status === 'COMPLETED' && (
                   <div className="space-y-3">
-                    <p className="text-green-600 font-medium">✅ Export completed</p>
+                    <p className="text-green-600 font-medium">{t('exportModal.completed')}</p>
                     {!!job.fileSize && (
                       <p className="text-xs text-neutral-400">
                         Size: {formatFileSize(job.fileSize)}
                       </p>
                     )}
                     <button onClick={handleDownload} className="btn btn-primary w-full">
-                      ⬇️ Download {job.format === 'PDF' ? 'PDF' : 'ZIP'}
+                      {job.format === 'PDF'
+                        ? t('exportModal.downloadPdf')
+                        : t('exportModal.downloadZip')}
                     </button>
                   </div>
                 )}
                 {job.status === 'FAILED' && (
                   <div className="space-y-2">
-                    <p className="text-red-600 font-medium">❌ Export error</p>
+                    <p className="text-red-600 font-medium">{t('exportModal.exportError')}</p>
                     <p className="text-xs text-red-500">{job.error}</p>
                     <button onClick={() => setJob(null)} className="btn btn-secondary text-sm">
-                      Retry
+                      {t('common.retry')}
                     </button>
                   </div>
                 )}
@@ -263,20 +288,20 @@ export default function ExportModal({ projectId, projectName, projectYear, onClo
           {!job && (
             <>
               <button onClick={onClose} className="btn btn-secondary text-sm">
-                Cancel
+                {t('common.cancel')}
               </button>
               <button
                 onClick={handleStart}
                 disabled={starting}
                 className="btn btn-primary text-sm disabled:opacity-50"
               >
-                {starting ? 'Starting...' : `Export ${format}`}
+                {starting ? t('exportModal.starting') : t('exportModal.exportFormat', { format })}
               </button>
             </>
           )}
           {job && (job.status === 'COMPLETED' || job.status === 'FAILED') && (
             <button onClick={onClose} className="btn btn-secondary text-sm">
-              Close
+              {t('common.close')}
             </button>
           )}
         </div>

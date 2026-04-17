@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { useTranslation } from 'react-i18next'
 import type { DayCell, Holiday, CalEvent } from '../lib/calendarTypes'
 import { MONTH_NAMES } from '../lib/calendarTypes'
 import ColorPicker from './ColorPicker'
@@ -41,6 +42,7 @@ export default function CellModal({
   onEventsChanged,
   onClose,
 }: Props) {
+  const { t } = useTranslation()
   const [bgColor, setBgColor] = useState(cell?.bgColor || '')
   const [text, setText] = useState(cell?.contentJson?.text || '')
   const [emoji, setEmoji] = useState(cell?.contentJson?.emoji || '')
@@ -132,7 +134,7 @@ export default function CellModal({
         onClick={(e) => e.stopPropagation()}
       >
         <h2 className="text-lg font-semibold text-neutral-900 mb-1">
-          Day {dayNumber} — {MONTH_NAMES[month - 1]} {year}
+          {t('cell.dayTitle', { day: dayNumber, month: MONTH_NAMES[month - 1], year })}
         </h2>
         {saint && <p className="text-xs text-neutral-400 mb-1">🕊️ {saint}</p>}
         <hr className="my-3 border-neutral-200" />
@@ -140,7 +142,7 @@ export default function CellModal({
         {/* Holidays */}
         {holidays.length > 0 && (
           <div className="mb-4">
-            <h3 className="text-sm font-medium text-red-600 mb-1">🏙️ Holidays</h3>
+            <h3 className="text-sm font-medium text-red-600 mb-1">{t('cell.holidays')}</h3>
             {holidays.map((h) => (
               <div key={h.id} className="text-xs bg-red-50 text-red-700 rounded px-2 py-1 mb-1">
                 {h.nameEs}
@@ -155,7 +157,7 @@ export default function CellModal({
         {/* Events */}
         {events.length > 0 && (
           <div className="mb-4">
-            <h3 className="text-sm font-medium text-neutral-700 mb-1">📅 Events</h3>
+            <h3 className="text-sm font-medium text-neutral-700 mb-1">{t('cell.events')}</h3>
             {events.map((ev) => (
               <div
                 key={ev.id}
@@ -164,12 +166,14 @@ export default function CellModal({
               >
                 <span style={{ color: ev.color }}>
                   {ev.icon || '•'} {ev.name}
-                  {ev.isRecurring && <span className="text-neutral-400 ml-1">(yearly)</span>}
+                  {ev.isRecurring && (
+                    <span className="text-neutral-400 ml-1">{t('cell.yearly')}</span>
+                  )}
                 </span>
                 <button
                   onClick={() => handleDeleteEvent(ev.id)}
                   className="text-neutral-400 hover:text-red-500 ml-2"
-                  title="Delete event"
+                  title={t('cell.deleteEvent')}
                 >
                   ✕
                 </button>
@@ -186,7 +190,7 @@ export default function CellModal({
                 type="text"
                 value={newEventName}
                 onChange={(e) => setNewEventName(e.target.value)}
-                placeholder="Event name"
+                placeholder={t('cell.eventName')}
                 className="w-full px-2 py-1.5 border border-neutral-300 rounded text-sm focus:ring-2 focus:ring-primary-500 outline-none"
                 autoFocus
                 maxLength={100}
@@ -197,18 +201,18 @@ export default function CellModal({
                   { v: 'BIRTHDAY' as const, l: '🎂' },
                   { v: 'ANNIVERSARY' as const, l: '💍' },
                   { v: 'CUSTOM' as const, l: '📌' },
-                ].map((t) => (
+                ].map((opt) => (
                   <button
-                    key={t.v}
+                    key={opt.v}
                     type="button"
-                    onClick={() => setNewEventType(t.v)}
+                    onClick={() => setNewEventType(opt.v)}
                     className={`px-2 py-0.5 text-xs rounded border ${
-                      newEventType === t.v
+                      newEventType === opt.v
                         ? 'bg-primary-50 border-primary-300'
                         : 'border-neutral-200'
                     }`}
                   >
-                    {t.l}
+                    {opt.l}
                   </button>
                 ))}
               </div>
@@ -217,14 +221,14 @@ export default function CellModal({
                   onClick={() => setShowNewEvent(false)}
                   className="text-xs text-neutral-500 px-2 py-1"
                 >
-                  Cancel
+                  {t('common.cancel')}
                 </button>
                 <button
                   onClick={handleAddQuickEvent}
                   disabled={savingEvent || !newEventName.trim()}
                   className="text-xs bg-primary-600 text-white px-3 py-1 rounded disabled:opacity-50"
                 >
-                  {savingEvent ? '...' : 'Add'}
+                  {savingEvent ? '...' : t('common.add')}
                 </button>
               </div>
             </div>
@@ -233,7 +237,7 @@ export default function CellModal({
               onClick={() => setShowNewEvent(true)}
               className="text-xs text-primary-600 hover:text-primary-800 transition-colors"
             >
-              + Add event for this day
+              {t('cell.addEventForDay')}
             </button>
           )}
         </div>
@@ -242,7 +246,7 @@ export default function CellModal({
 
         {/* Cell image */}
         <div className="mb-4">
-          <h3 className="text-sm font-medium text-neutral-700 mb-2">🖼️ Cell image</h3>
+          <h3 className="text-sm font-medium text-neutral-700 mb-2">{t('cell.cellImage')}</h3>
           {imageFilename ? (
             <div className="flex items-center gap-3">
               <div className="w-16 h-16 rounded-lg overflow-hidden border border-neutral-200 bg-neutral-50">
@@ -259,7 +263,7 @@ export default function CellModal({
                 }}
                 className="text-xs text-red-500 hover:text-red-700 transition-colors"
               >
-                ✕ Quitar imagen
+                {t('cell.removeImage')}
               </button>
             </div>
           ) : (
@@ -267,14 +271,14 @@ export default function CellModal({
               onClick={() => setShowImagePicker(true)}
               className="w-full px-3 py-2 border border-dashed border-neutral-300 rounded-lg text-sm text-neutral-500 hover:border-primary-400 hover:text-primary-600 transition-colors"
             >
-              + Seleccionar imagen de la biblioteca
+              {t('cell.selectFromLibrary')}
             </button>
           )}
         </div>
 
         {/* Sticker / Emoji */}
         <div className="mb-4">
-          <h3 className="text-sm font-medium text-neutral-700 mb-2">Sticker / Emoji</h3>
+          <h3 className="text-sm font-medium text-neutral-700 mb-2">{t('cell.stickerEmoji')}</h3>
           <div className="flex items-center gap-2">
             {/* Emoji display */}
             {emoji && (
@@ -311,13 +315,13 @@ export default function CellModal({
               onClick={() => setShowStickerPicker(true)}
               className="px-3 py-1.5 text-sm border border-neutral-300 rounded-md hover:bg-neutral-50 transition-colors"
             >
-              😀 Emoji
+              {t('cell.emojiButton')}
             </button>
             <button
               onClick={() => setShowStickerAssetPicker(true)}
               className="px-3 py-1.5 text-sm border border-neutral-300 rounded-md hover:bg-neutral-50 transition-colors"
             >
-              🎨 Sticker
+              {t('cell.stickerButton')}
             </button>
           </div>
         </div>
@@ -326,7 +330,7 @@ export default function CellModal({
 
         {/* Background color */}
         <div className="mb-4">
-          <h3 className="text-sm font-medium text-neutral-700 mb-2">Color de fondo</h3>
+          <h3 className="text-sm font-medium text-neutral-700 mb-2">{t('cell.bgColor')}</h3>
           <div className="flex items-end gap-2">
             <div className="flex-1">
               <ColorPicker color={bgColor || '#FFFFFF'} onChange={setBgColor} />
@@ -335,19 +339,21 @@ export default function CellModal({
               onClick={handleClearBg}
               className="text-xs text-neutral-500 hover:text-red-500 px-2 py-1 border border-neutral-300 rounded transition-colors"
             >
-              Limpiar
+              {t('cell.clear')}
             </button>
           </div>
         </div>
 
         {/* Text */}
         <div className="mb-6">
-          <label className="text-sm font-medium text-neutral-700 block mb-1">Texto</label>
+          <label className="text-sm font-medium text-neutral-700 block mb-1">
+            {t('cell.text')}
+          </label>
           <input
             type="text"
             value={text}
             onChange={(e) => setText(e.target.value)}
-            placeholder="Ana's birthday"
+            placeholder={t('cell.textPlaceholder')}
             className="w-full px-3 py-2 border border-neutral-300 rounded-md text-sm focus:ring-2 focus:ring-primary-500 outline-none"
             maxLength={60}
           />
@@ -359,10 +365,10 @@ export default function CellModal({
             onClick={onClose}
             className="px-4 py-2 text-sm text-neutral-600 hover:text-neutral-800 border border-neutral-300 rounded-md transition-colors"
           >
-            Cancel
+            {t('common.cancel')}
           </button>
           <button onClick={handleSave} className="btn btn-primary">
-            Save
+            {t('common.save')}
           </button>
         </div>
       </div>
@@ -377,7 +383,7 @@ export default function CellModal({
           setShowImagePicker(false)
         }}
         assetType="IMAGE"
-        title="Seleccionar imagen para la celda"
+        title={t('cell.selectImageTitle')}
       />
       <AssetPickerModal
         isOpen={showStickerAssetPicker}
@@ -388,7 +394,7 @@ export default function CellModal({
           setShowStickerAssetPicker(false)
         }}
         assetType="STICKER"
-        title="Seleccionar sticker de la biblioteca"
+        title={t('cell.selectStickerTitle')}
       />
       <StickerPickerModal
         isOpen={showStickerPicker}

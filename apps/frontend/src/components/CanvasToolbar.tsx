@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next'
 import type { CanvasEditorHandle } from './CanvasEditor'
 
 interface CanvasToolbarProps {
@@ -13,49 +14,62 @@ export default function CanvasToolbar({
   onAddSticker,
   onBackgroundSettings,
 }: CanvasToolbarProps) {
+  const { t } = useTranslation()
   const editor = editorRef.current
 
   return (
     <div className="flex items-center gap-1 bg-white rounded-lg border border-neutral-200 px-2 py-1.5 shadow-sm flex-wrap">
       {/* Selection / Move (default) */}
-      <ToolButton title="Seleccionar / Mover" icon="↖" onClick={() => {}} active />
+      <ToolButton title={t('toolbar.selectMove')} icon="↖" onClick={() => {}} active />
 
       <Separator />
 
       {/* Add elements */}
-      <ToolButton title="Add image" icon="🖼️" onClick={onAddImage} />
+      <ToolButton title={t('toolbar.addImage')} icon="🖼️" onClick={onAddImage} />
       <ToolButton
-        title="Add text"
+        title={t('toolbar.addText')}
         icon="T"
         onClick={() => editor?.addText()}
         textStyle="font-bold text-base"
       />
-      <ToolButton title="Add sticker" icon="😀" onClick={onAddSticker} />
+      <ToolButton title={t('toolbar.addSticker')} icon="😀" onClick={onAddSticker} />
 
       <Separator />
 
       {/* Background */}
-      <ToolButton title="Background" icon="🎨" onClick={onBackgroundSettings} />
+      <ToolButton title={t('toolbar.background')} icon="🎨" onClick={onBackgroundSettings} />
 
       <Separator />
 
       {/* Layer controls */}
-      <ToolButton title="Traer al frente" icon="⬆" onClick={() => editor?.bringToFront()} />
-      <ToolButton title="Subir capa" icon="↑" onClick={() => editor?.bringForward()} />
-      <ToolButton title="Bajar capa" icon="↓" onClick={() => editor?.sendBackward()} />
-      <ToolButton title="Enviar al fondo" icon="⬇" onClick={() => editor?.sendToBack()} />
+      <ToolButton
+        title={t('toolbar.bringToFront')}
+        icon="⬆"
+        onClick={() => editor?.bringToFront()}
+      />
+      <ToolButton
+        title={t('toolbar.bringForward')}
+        icon="↑"
+        onClick={() => editor?.bringForward()}
+      />
+      <ToolButton
+        title={t('toolbar.sendBackward')}
+        icon="↓"
+        onClick={() => editor?.sendBackward()}
+      />
+      <ToolButton title={t('toolbar.sendToBack')} icon="⬇" onClick={() => editor?.sendToBack()} />
 
       <Separator />
 
       {/* Undo/Redo */}
       <ToolButton
-        title="Deshacer (Ctrl+Z)"
+        title={t('toolbar.undo')}
         icon="↩"
         onClick={() => editor?.undo()}
         disabled={!editor?.canUndo}
       />
       <ToolButton
-        title="Rehacer (Ctrl+Y)"
+        title={t('toolbar.redo')}
         icon="↪"
         onClick={() => editor?.redo()}
         disabled={!editor?.canRedo}
@@ -64,18 +78,18 @@ export default function CanvasToolbar({
       <Separator />
 
       {/* Zoom */}
-      <ToolButton title="Alejar" icon="−" onClick={() => editor?.zoomOut()} />
+      <ToolButton title={t('toolbar.zoomOut')} icon="−" onClick={() => editor?.zoomOut()} />
       <span className="text-xs text-neutral-500 min-w-[3rem] text-center select-none">
         {Math.round((editor?.zoom ?? 1) * 100)}%
       </span>
-      <ToolButton title="Acercar" icon="+" onClick={() => editor?.zoomIn()} />
-      <ToolButton title="Zoom 100%" icon="⊡" onClick={() => editor?.zoomReset()} />
+      <ToolButton title={t('toolbar.zoomIn')} icon="+" onClick={() => editor?.zoomIn()} />
+      <ToolButton title={t('toolbar.zoomReset')} icon="⊡" onClick={() => editor?.zoomReset()} />
 
       <Separator />
 
       {/* Delete */}
       <ToolButton
-        title="Delete selected"
+        title={t('toolbar.deleteSelected')}
         icon="🗑"
         onClick={() => editor?.deleteSelected()}
         className="text-red-500 hover:!bg-red-50"

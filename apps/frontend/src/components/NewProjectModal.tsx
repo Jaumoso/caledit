@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { useTranslation } from 'react-i18next'
 import api from '../lib/api'
 
 const AUTONOMY_CODES = [
@@ -35,6 +36,7 @@ interface Props {
 }
 
 export default function NewProjectModal({ onClose, onCreate }: Props) {
+  const { t } = useTranslation()
   const currentYear = new Date().getFullYear()
   const [name, setName] = useState('')
   const [year, setYear] = useState(currentYear + 1)
@@ -73,7 +75,7 @@ export default function NewProjectModal({ onClose, onCreate }: Props) {
       })
       onCreate()
     } catch {
-      setError('Error creating project')
+      setError(t('newProject.errorCreating'))
       setLoading(false)
     }
   }
@@ -82,19 +84,19 @@ export default function NewProjectModal({ onClose, onCreate }: Props) {
     <div className="fixed inset-0 z-50 flex items-center justify-center">
       <div className="absolute inset-0 bg-black/40" onClick={onClose} />
       <div className="relative bg-white rounded-lg shadow-xl w-full max-w-md mx-4 p-6">
-        <h2 className="text-lg font-semibold text-neutral-900 mb-4">New calendar</h2>
+        <h2 className="text-lg font-semibold text-neutral-900 mb-4">{t('newProject.title')}</h2>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <label htmlFor="name" className="block text-sm font-medium text-neutral-700 mb-1">
-              Name
+              {t('newProject.nameLabel')}
             </label>
             <input
               id="name"
               type="text"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              placeholder="E.g.: Family calendar 2027"
+              placeholder={t('newProject.namePlaceholder')}
               className="w-full px-3 py-2 border border-neutral-300 rounded-md text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none"
               autoFocus
               required
@@ -103,7 +105,7 @@ export default function NewProjectModal({ onClose, onCreate }: Props) {
 
           <div>
             <label htmlFor="year" className="block text-sm font-medium text-neutral-700 mb-1">
-              Year
+              {t('newProject.yearLabel')}
             </label>
             <input
               id="year"
@@ -118,7 +120,7 @@ export default function NewProjectModal({ onClose, onCreate }: Props) {
 
           <div>
             <label className="block text-sm font-medium text-neutral-700 mb-1">
-              Week starts on
+              {t('newProject.weekStartsOn')}
             </label>
             <div className="flex gap-3">
               <label className="flex items-center gap-2 text-sm">
@@ -130,7 +132,7 @@ export default function NewProjectModal({ onClose, onCreate }: Props) {
                   onChange={() => setWeekStartsOn('monday')}
                   className="accent-primary-600"
                 />
-                Monday
+                {t('newProject.monday')}
               </label>
               <label className="flex items-center gap-2 text-sm">
                 <input
@@ -141,21 +143,21 @@ export default function NewProjectModal({ onClose, onCreate }: Props) {
                   onChange={() => setWeekStartsOn('sunday')}
                   className="accent-primary-600"
                 />
-                Sunday
+                {t('newProject.sunday')}
               </label>
             </div>
           </div>
 
           <div>
             <label className="block text-sm font-medium text-neutral-700 mb-1">
-              Autonomous Community (holidays)
+              {t('newProject.autonomy')}
             </label>
             <select
               value={autonomyCode}
               onChange={(e) => setAutonomyCode(e.target.value)}
               className="w-full px-3 py-2 border border-neutral-300 rounded-md text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none"
             >
-              <option value="">National holidays only</option>
+              <option value="">{t('newProject.nationalOnly')}</option>
               {AUTONOMY_CODES.map((a) => (
                 <option key={a.code} value={a.code}>
                   {a.name}
@@ -167,14 +169,14 @@ export default function NewProjectModal({ onClose, onCreate }: Props) {
           {templates.length > 0 && (
             <div>
               <label className="block text-sm font-medium text-neutral-700 mb-1">
-                Base template
+                {t('newProject.baseTemplate')}
               </label>
               <select
                 value={templateId}
                 onChange={(e) => setTemplateId(e.target.value)}
                 className="w-full px-3 py-2 border border-neutral-300 rounded-md text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none"
               >
-                <option value="">No template</option>
+                <option value="">{t('newProject.noTemplate')}</option>
                 {templates.map((t) => (
                   <option key={t.id} value={t.id}>
                     {t.name}
@@ -182,9 +184,7 @@ export default function NewProjectModal({ onClose, onCreate }: Props) {
                   </option>
                 ))}
               </select>
-              <p className="text-[10px] text-neutral-400 mt-0.5">
-                The template will be applied to all 12 months when creating the project
-              </p>
+              <p className="text-[10px] text-neutral-400 mt-0.5">{t('newProject.templateHint')}</p>
             </div>
           )}
 
@@ -197,14 +197,14 @@ export default function NewProjectModal({ onClose, onCreate }: Props) {
               className="px-4 py-2 text-sm text-neutral-600 hover:text-neutral-800 transition-colors"
               disabled={loading}
             >
-              Cancel
+              {t('common.cancel')}
             </button>
             <button
               type="submit"
               disabled={loading || !name.trim()}
               className="btn btn-primary disabled:opacity-50"
             >
-              {loading ? 'Creating...' : 'Create calendar'}
+              {loading ? t('newProject.creating') : t('newProject.createCalendar')}
             </button>
           </div>
         </form>

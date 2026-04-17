@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react'
+import { useTranslation } from 'react-i18next'
 import type * as fabric from 'fabric'
 import type { CanvasEditorHandle } from './CanvasEditor'
 
@@ -13,6 +14,7 @@ export default function ObjectPropertiesPanel({
   selectedObject,
   onModified,
 }: ObjectPropertiesPanelProps) {
+  const { t } = useTranslation()
   const [props, setProps] = useState<Record<string, unknown>>({})
 
   const readProps = useCallback(() => {
@@ -79,7 +81,7 @@ export default function ObjectPropertiesPanel({
   if (!selectedObject) {
     return (
       <div className="text-xs text-neutral-400 text-center py-4">
-        Selecciona un elemento para ver sus propiedades
+        {t('objectProps.noSelection')}
       </div>
     )
   }
@@ -87,7 +89,7 @@ export default function ObjectPropertiesPanel({
   return (
     <div className="space-y-4">
       <h3 className="text-xs font-semibold text-neutral-500 uppercase tracking-wide">
-        Propiedades
+        {t('objectProps.title')}
       </h3>
 
       {/* Position */}
@@ -103,7 +105,7 @@ export default function ObjectPropertiesPanel({
       {/* Scale */}
       <div className="grid grid-cols-2 gap-2">
         <NumberField
-          label="Ancho %"
+          label={t('objectProps.widthPercent')}
           value={Math.round((props.scaleX as number) * 100)}
           onChange={(v) => {
             const scale = v / 100
@@ -114,7 +116,7 @@ export default function ObjectPropertiesPanel({
           max={500}
         />
         <NumberField
-          label="Ángulo"
+          label={t('objectProps.angle')}
           value={props.angle as number}
           onChange={(v) => updateProp('angle', v)}
           min={0}
@@ -124,7 +126,7 @@ export default function ObjectPropertiesPanel({
 
       {/* Opacity */}
       <div>
-        <label className="text-xs text-neutral-500">Opacidad</label>
+        <label className="text-xs text-neutral-500">{t('objectProps.opacity')}</label>
         <input
           type="range"
           min={0}
@@ -143,7 +145,7 @@ export default function ObjectPropertiesPanel({
       {selectedObject.type === 'image' && (
         <>
           <div>
-            <label className="text-xs text-neutral-500">Brillo</label>
+            <label className="text-xs text-neutral-500">{t('objectProps.brightness')}</label>
             <input
               type="range"
               min={-1}
@@ -155,7 +157,7 @@ export default function ObjectPropertiesPanel({
             />
           </div>
           <div>
-            <label className="text-xs text-neutral-500">Contraste</label>
+            <label className="text-xs text-neutral-500">{t('objectProps.contrast')}</label>
             <input
               type="range"
               min={-1}
@@ -168,7 +170,7 @@ export default function ObjectPropertiesPanel({
           </div>
           <div className="flex gap-1 flex-wrap">
             <FilterButton
-              label="Grises"
+              label={t('objectProps.grayscale')}
               onClick={() =>
                 toggleGrayscale(
                   selectedObject as fabric.FabricImage,
@@ -178,7 +180,7 @@ export default function ObjectPropertiesPanel({
               }
             />
             <FilterButton
-              label="Sepia"
+              label={t('objectProps.sepia')}
               onClick={() =>
                 toggleSepia(
                   selectedObject as fabric.FabricImage,
@@ -195,7 +197,7 @@ export default function ObjectPropertiesPanel({
       {isTextObject(selectedObject) && (
         <>
           <div>
-            <label className="text-xs text-neutral-500">Font size</label>
+            <label className="text-xs text-neutral-500">{t('objectProps.fontSize')}</label>
             <input
               type="number"
               value={props.fontSize as number}
@@ -206,7 +208,7 @@ export default function ObjectPropertiesPanel({
             />
           </div>
           <div>
-            <label className="text-xs text-neutral-500">Text color</label>
+            <label className="text-xs text-neutral-500">{t('objectProps.textColor')}</label>
             <input
               type="color"
               value={(props.fill as string) || '#000000'}

@@ -1,5 +1,6 @@
 import type { GridConfig, DayPosition } from '../lib/calendarTypes'
 import { PAGE_WIDTH, PAGE_HEIGHT } from '../lib/calendarTypes'
+import { useTranslation } from 'react-i18next'
 import ColorPicker from './ColorPicker'
 import FontSelector from './FontSelector'
 
@@ -21,6 +22,7 @@ const POSITIONS: { value: DayPosition; label: string }[] = [
 ]
 
 export default function GridPropertiesPanel({ config, onChange }: Props) {
+  const { t } = useTranslation()
   const update = <K extends keyof GridConfig>(key: K, value: GridConfig[K]) => {
     onChange({ ...config, [key]: value })
   }
@@ -28,12 +30,12 @@ export default function GridPropertiesPanel({ config, onChange }: Props) {
   return (
     <div className="space-y-5 text-sm">
       <h3 className="font-semibold text-neutral-800 text-xs uppercase tracking-wider">
-        Grid del calendario
+        {t('grid.title')}
       </h3>
 
       {/* Position & Size */}
       <section>
-        <h4 className="text-xs font-medium text-neutral-600 mb-2">Position & size</h4>
+        <h4 className="text-xs font-medium text-neutral-600 mb-2">{t('grid.positionSize')}</h4>
         <div className="grid grid-cols-2 gap-2">
           <div>
             <label className="text-[10px] text-neutral-500 block mb-0.5">X (px)</label>
@@ -84,11 +86,11 @@ export default function GridPropertiesPanel({ config, onChange }: Props) {
 
       {/* Background */}
       <section>
-        <h4 className="text-xs font-medium text-neutral-600 mb-2">Table background</h4>
+        <h4 className="text-xs font-medium text-neutral-600 mb-2">{t('grid.tableBackground')}</h4>
         <ColorPicker label="Color" color={config.bgColor} onChange={(c) => update('bgColor', c)} />
         <div className="mt-2">
           <label className="text-xs text-neutral-500">
-            Background opacity: {config.bgOpacity}%
+            {t('grid.bgOpacity', { value: config.bgOpacity })}
           </label>
           <input
             type="range"
@@ -101,7 +103,7 @@ export default function GridPropertiesPanel({ config, onChange }: Props) {
         </div>
         <div className="mt-2">
           <label className="text-xs text-neutral-500">
-            General grid opacity: {config.gridOverlayOpacity}%
+            {t('grid.gridOpacity', { value: config.gridOverlayOpacity })}
           </label>
           <input
             type="range"
@@ -111,23 +113,21 @@ export default function GridPropertiesPanel({ config, onChange }: Props) {
             onChange={(e) => update('gridOverlayOpacity', Number(e.target.value))}
             className="w-full accent-primary-500"
           />
-          <p className="text-[10px] text-neutral-400 mt-0.5">
-            Controls the transparency of the whole table over the page background
-          </p>
+          <p className="text-[10px] text-neutral-400 mt-0.5">{t('grid.gridOpacityHint')}</p>
         </div>
       </section>
 
       {/* Borders */}
       <section>
-        <h4 className="text-xs font-medium text-neutral-600 mb-2">Borders</h4>
+        <h4 className="text-xs font-medium text-neutral-600 mb-2">{t('grid.borders')}</h4>
         <ColorPicker
-          label="Color"
+          label={t('common.color')}
           color={config.borderColor}
           onChange={(c) => update('borderColor', c)}
         />
         <div className="mt-2 flex gap-2">
           <div className="flex-1">
-            <label className="text-xs text-neutral-500 block mb-1">Thickness</label>
+            <label className="text-xs text-neutral-500 block mb-1">{t('grid.thickness')}</label>
             <select
               value={config.borderWidth}
               onChange={(e) => update('borderWidth', Number(e.target.value))}
@@ -141,16 +141,16 @@ export default function GridPropertiesPanel({ config, onChange }: Props) {
             </select>
           </div>
           <div className="flex-1">
-            <label className="text-xs text-neutral-500 block mb-1">Style</label>
+            <label className="text-xs text-neutral-500 block mb-1">{t('grid.style')}</label>
             <select
               value={config.borderStyle}
               onChange={(e) => update('borderStyle', e.target.value as GridConfig['borderStyle'])}
               className="w-full text-xs border border-neutral-300 rounded px-2 py-1 outline-none focus:ring-1 focus:ring-primary-500"
             >
-              <option value="solid">Solid</option>
-              <option value="dashed">Dashed</option>
-              <option value="dotted">Dotted</option>
-              <option value="none">None</option>
+              <option value="solid">{t('grid.styleSolid')}</option>
+              <option value="dashed">{t('grid.styleDashed')}</option>
+              <option value="dotted">{t('grid.styleDotted')}</option>
+              <option value="none">{t('grid.styleNone')}</option>
             </select>
           </div>
         </div>
@@ -158,15 +158,15 @@ export default function GridPropertiesPanel({ config, onChange }: Props) {
 
       {/* Day numbers */}
       <section>
-        <h4 className="text-xs font-medium text-neutral-600 mb-2">Day numbers</h4>
+        <h4 className="text-xs font-medium text-neutral-600 mb-2">{t('grid.dayNumbers')}</h4>
         <FontSelector
-          label="Fuente"
+          label={t('grid.font')}
           value={config.dayFontFamily}
           onChange={(f) => update('dayFontFamily', f)}
         />
         <div className="mt-2 flex gap-2">
           <div className="flex-1">
-            <label className="text-xs text-neutral-500 block mb-1">Size</label>
+            <label className="text-xs text-neutral-500 block mb-1">{t('grid.size')}</label>
             <input
               type="number"
               min={8}
@@ -177,20 +177,20 @@ export default function GridPropertiesPanel({ config, onChange }: Props) {
             />
           </div>
           <div className="flex-1">
-            <label className="text-xs text-neutral-500 block mb-1">Weight</label>
+            <label className="text-xs text-neutral-500 block mb-1">{t('grid.weight')}</label>
             <select
               value={config.dayFontWeight}
               onChange={(e) => update('dayFontWeight', e.target.value as 'normal' | 'bold')}
               className="w-full text-xs border border-neutral-300 rounded px-2 py-1 outline-none focus:ring-1 focus:ring-primary-500"
             >
-              <option value="normal">Normal</option>
-              <option value="bold">Bold</option>
+              <option value="normal">{t('grid.weightNormal')}</option>
+              <option value="bold">{t('grid.weightBold')}</option>
             </select>
           </div>
         </div>
         <div className="mt-2">
           <ColorPicker
-            label="Color"
+            label={t('common.color')}
             color={config.dayFontColor}
             onChange={(c) => update('dayFontColor', c)}
           />
@@ -198,7 +198,7 @@ export default function GridPropertiesPanel({ config, onChange }: Props) {
 
         {/* Position grid */}
         <div className="mt-3">
-          <label className="text-xs text-neutral-500 block mb-1">Number position</label>
+          <label className="text-xs text-neutral-500 block mb-1">{t('grid.numberPosition')}</label>
           <div className="grid grid-cols-3 gap-1 w-24">
             {POSITIONS.map((p) => (
               <button
@@ -220,9 +220,9 @@ export default function GridPropertiesPanel({ config, onChange }: Props) {
 
       {/* Weekend */}
       <section>
-        <h4 className="text-xs font-medium text-neutral-600 mb-2">Weekend</h4>
+        <h4 className="text-xs font-medium text-neutral-600 mb-2">{t('grid.weekend')}</h4>
         <ColorPicker
-          label="Background color"
+          label={t('grid.bgColor')}
           color={config.weekendBgColor}
           onChange={(c) => update('weekendBgColor', c)}
         />
@@ -230,15 +230,15 @@ export default function GridPropertiesPanel({ config, onChange }: Props) {
 
       {/* Header */}
       <section>
-        <h4 className="text-xs font-medium text-neutral-600 mb-2">Header (weekdays)</h4>
+        <h4 className="text-xs font-medium text-neutral-600 mb-2">{t('grid.headerWeekdays')}</h4>
         <FontSelector
-          label="Fuente"
+          label={t('grid.font')}
           value={config.headerFontFamily}
           onChange={(f) => update('headerFontFamily', f)}
         />
         <div className="mt-2 flex gap-2">
           <div className="flex-1">
-            <label className="text-xs text-neutral-500 block mb-1">Size</label>
+            <label className="text-xs text-neutral-500 block mb-1">{t('grid.size')}</label>
             <input
               type="number"
               min={8}
@@ -251,14 +251,14 @@ export default function GridPropertiesPanel({ config, onChange }: Props) {
         </div>
         <div className="mt-2">
           <ColorPicker
-            label="Color texto"
+            label={t('grid.textColor')}
             color={config.headerFontColor}
             onChange={(c) => update('headerFontColor', c)}
           />
         </div>
         <div className="mt-2">
           <ColorPicker
-            label="Color fondo"
+            label={t('grid.headerBgColor')}
             color={config.headerBgColor}
             onChange={(c) => update('headerBgColor', c)}
           />
@@ -267,7 +267,7 @@ export default function GridPropertiesPanel({ config, onChange }: Props) {
 
       {/* Holidays, events & saints */}
       <section>
-        <h4 className="text-xs font-medium text-neutral-600 mb-2">Holidays & events</h4>
+        <h4 className="text-xs font-medium text-neutral-600 mb-2">{t('grid.holidaysEvents')}</h4>
         <label className="flex items-center gap-2 text-xs text-neutral-700 mb-2">
           <input
             type="checkbox"
@@ -275,12 +275,12 @@ export default function GridPropertiesPanel({ config, onChange }: Props) {
             onChange={(e) => update('showHolidays', e.target.checked)}
             className="accent-primary-600"
           />
-          Show holidays
+          {t('grid.showHolidays')}
         </label>
         {config.showHolidays && (
           <div className="mb-2 ml-5">
             <ColorPicker
-              label="Holiday color"
+              label={t('grid.holidayColor')}
               color={config.holidayBgColor}
               onChange={(c) => update('holidayBgColor', c)}
             />
@@ -293,7 +293,7 @@ export default function GridPropertiesPanel({ config, onChange }: Props) {
             onChange={(e) => update('showEvents', e.target.checked)}
             className="accent-primary-600"
           />
-          Show events
+          {t('grid.showEvents')}
         </label>
         <label className="flex items-center gap-2 text-xs text-neutral-700">
           <input
@@ -302,7 +302,7 @@ export default function GridPropertiesPanel({ config, onChange }: Props) {
             onChange={(e) => update('showSaints', e.target.checked)}
             className="accent-primary-600"
           />
-          Show name day
+          {t('grid.showNameDay')}
         </label>
       </section>
     </div>

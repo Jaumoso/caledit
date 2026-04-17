@@ -41,7 +41,7 @@ export default function AdminPage() {
       const { data } = await api.get('/users')
       setUsers(data.users)
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Error loading users')
+      setError(err instanceof Error ? err.message : t('admin.errorLoading'))
     } finally {
       setIsLoading(false)
     }
@@ -63,7 +63,7 @@ export default function AdminPage() {
       await fetchUsers()
     } catch (err) {
       const axiosErr = err as { response?: { data?: { message?: string } } }
-      setCreateError(axiosErr.response?.data?.message || 'Error creating user')
+      setCreateError(axiosErr.response?.data?.message || t('admin.errorCreating'))
     }
   }
 
@@ -72,7 +72,7 @@ export default function AdminPage() {
       await api.patch(`/users/${userId}/status`, { active: !isActive })
       await fetchUsers()
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Error updating user')
+      setError(err instanceof Error ? err.message : t('admin.errorUpdating'))
     }
   }
 
@@ -82,7 +82,7 @@ export default function AdminPage() {
       setEditingUser(null)
       await fetchUsers()
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Error updating user')
+      setError(err instanceof Error ? err.message : t('admin.errorUpdating'))
     }
   }
 
@@ -93,7 +93,7 @@ export default function AdminPage() {
       await api.delete(`/users/${userId}`)
       await fetchUsers()
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Error deleting user')
+      setError(err instanceof Error ? err.message : t('admin.errorDeleting'))
     }
   }
 

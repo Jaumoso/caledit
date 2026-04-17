@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
+import { useTranslation } from 'react-i18next'
 import api from '../lib/api'
 
 interface Asset {
@@ -28,6 +29,7 @@ function formatSize(bytes: number): string {
 }
 
 export default function LibraryPage() {
+  const { t } = useTranslation()
   const [assets, setAssets] = useState<Asset[]>([])
   const [folders, setFolders] = useState<Folder[]>([])
   const [currentFolderId, setCurrentFolderId] = useState<string | null>(null)
@@ -63,7 +65,7 @@ export default function LibraryPage() {
       const { data } = await api.get('/assets', { params })
       setAssets(data.assets)
     } catch {
-      setError('Error loading assets')
+      setError(t('library.errorLoading'))
     } finally {
       setLoading(false)
     }
@@ -101,7 +103,7 @@ export default function LibraryPage() {
       fetchAssets()
       fetchFolders()
     } catch {
-      setError('Error uploading files')
+      setError(t('library.errorUploading'))
     } finally {
       setUploading(false)
       setUploadProgress(0)
@@ -117,12 +119,12 @@ export default function LibraryPage() {
   }
 
   const handleDelete = async (id: string) => {
-    if (!confirm('Delete this file?')) return
+    if (!confirm(t('library.deleteFile'))) return
     try {
       await api.delete(`/assets/${id}`)
       setAssets((prev) => prev.filter((a) => a.id !== id))
     } catch {
-      setError('Error deleting')
+      setError(t('library.errorDeleting'))
     }
   }
 
@@ -137,19 +139,19 @@ export default function LibraryPage() {
       setShowNewFolder(false)
       fetchFolders()
     } catch {
-      setError('Error creating folder')
+      setError(t('library.errorCreatingFolder'))
     }
   }
 
   const handleDeleteFolder = async (id: string, name: string) => {
-    if (!confirm(`Delete folder "${name}"? Files will be moved to root.`)) return
+    if (!confirm(t('library.deleteFolder', { name }))) return
     try {
       await api.delete(`/folders/${id}`)
       if (currentFolderId === id) setCurrentFolderId(null)
       fetchFolders()
       fetchAssets()
     } catch {
-      setError('Error deleting folder')
+      setError(t('library.errorDeletingFolder'))
     }
   }
 
@@ -172,16 +174,16 @@ export default function LibraryPage() {
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold text-neutral-900">Library</h1>
+        <h1 className="text-2xl font-bold text-neutral-900">{t('library.title')}</h1>
         <div className="flex gap-2">
           <button
             onClick={() => setShowNewFolder(true)}
             className="px-3 py-2 text-sm border border-neutral-300 rounded-md hover:bg-neutral-100 transition-colors"
           >
-            New folder
+            {t('library.newFolder')}
           </button>
           <button onClick={() => fileInputRef.current?.click()} className="btn btn-primary">
-            Upload files
+            {t('library.uploadFiles')}
           </button>
           <input
             ref={fileInputRef}
@@ -198,7 +200,7 @@ export default function LibraryPage() {
         <div className="mb-4 p-3 bg-red-50 text-red-700 rounded-lg text-sm">
           {error}
           <button onClick={() => setError(null)} className="ml-2 underline">
-            Close
+            {t('common.close')}
           </button>
         </div>
       )}
@@ -209,7 +211,7 @@ export default function LibraryPage() {
           onClick={() => setCurrentFolderId(null)}
           className={`hover:text-primary-600 transition-colors ${!currentFolderId ? 'font-semibold text-neutral-900' : 'text-neutral-500'}`}
         >
-          Root
+          {t('library.root')}
         </button>
         {breadcrumb.map((f) => (
           <span key={f.id} className="flex items-center gap-1">
@@ -228,7 +230,7 @@ export default function LibraryPage() {
       <div className="mb-4">
         <input
           type="text"
-          placeholder="Search by name..."
+          placeholder={t('library.searchPlaceholder')}
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           className="w-full max-w-sm px-3 py-2 border border-neutral-300 rounded-md text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none"
@@ -240,7 +242,7 @@ export default function LibraryPage() {
         <div className="mb-4 flex items-center gap-2">
           <input
             type="text"
-            placeholder="Folder name"
+            placeholder={t('library.folderName')}
             value={newFolderName}
             onChange={(e) => setNewFolderName(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && handleCreateFolder()}
@@ -248,7 +250,7 @@ export default function LibraryPage() {
             autoFocus
           />
           <button onClick={handleCreateFolder} className="text-sm text-primary-600 hover:underline">
-            Create
+            {t('common.create')}
           </button>
           <button
             onClick={() => {
@@ -257,7 +259,7 @@ export default function LibraryPage() {
             }}
             className="text-sm text-neutral-500 hover:underline"
           >
-            Cancel
+            {t('common.cancel')}
           </button>
         </div>
       )}
@@ -292,7 +294,7 @@ export default function LibraryPage() {
         {/* Subfolders */}
         {currentSubfolders.length > 0 && (
           <div className="mb-6">
-            <h2 className="text-sm font-medium text-neutral-500 mb-2">Folders</h2>
+            <h2 className="text-sm font-medium text-neutral-500 mb-2">{t('library.folders')}</h2>
             <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 gap-3">
               {currentSubfolders.map((folder) => (
                 <div
@@ -303,7 +305,9 @@ export default function LibraryPage() {
                   <div className="text-2xl mb-1">📁</div>
                   <p className="text-sm font-medium text-neutral-800 truncate">{folder.name}</p>
                   <p className="text-xs text-neutral-400">
-                    {folder._count.assets} file{folder._count.assets !== 1 && 's'}
+                    {folder._count.assets === 1
+                      ? t('library.fileCount_one', { count: folder._count.assets })
+                      : t('library.fileCount_other', { count: folder._count.assets })}
                   </p>
                   <button
                     onClick={(e) => {
@@ -311,7 +315,7 @@ export default function LibraryPage() {
                       handleDeleteFolder(folder.id, folder.name)
                     }}
                     className="absolute top-1 right-1 text-neutral-300 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity text-xs p-1"
-                    title="Delete folder"
+                    title={t('library.deleteThisFolder')}
                   >
                     ✕
                   </button>
@@ -332,12 +336,10 @@ export default function LibraryPage() {
           <div className="text-center py-16">
             <div className="text-5xl mb-4">🖼️</div>
             <h2 className="text-lg font-semibold text-neutral-700 mb-2">
-              {search ? 'No results' : 'No files here'}
+              {search ? t('library.noResults') : t('library.noFiles')}
             </h2>
             <p className="text-neutral-500 mb-4">
-              {search
-                ? 'Try a different search term.'
-                : 'Drag images here or use the "Upload files" button.'}
+              {search ? t('library.noResultsHint') : t('library.noFilesHint')}
             </p>
           </div>
         ) : (
@@ -345,7 +347,7 @@ export default function LibraryPage() {
             {assets.length > 0 && (
               <>
                 <h2 className="text-sm font-medium text-neutral-500 mb-2">
-                  Files ({assets.length})
+                  {t('library.files', { count: assets.length })}
                 </h2>
                 <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 gap-4">
                   {assets.map((asset) => (
@@ -382,7 +384,7 @@ export default function LibraryPage() {
                       <button
                         onClick={() => handleDelete(asset.id)}
                         className="absolute top-1 right-1 bg-black/50 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs opacity-0 group-hover:opacity-100 transition-opacity"
-                        title="Delete"
+                        title={t('common.delete')}
                       >
                         ✕
                       </button>
@@ -397,7 +399,7 @@ export default function LibraryPage() {
         {dragOver && (
           <div className="fixed inset-0 z-40 pointer-events-none flex items-center justify-center">
             <div className="bg-primary-600/90 text-white px-8 py-4 rounded-xl text-lg font-medium shadow-2xl">
-              Drop files to upload
+              {t('library.dropToUpload')}
             </div>
           </div>
         )}

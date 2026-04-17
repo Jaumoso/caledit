@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useParams, Link, useNavigate } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import api from '../lib/api'
 import ApplyTemplateModal from '../components/ApplyTemplateModal'
 import ExportModal from '../components/ExportModal'
@@ -21,25 +22,10 @@ interface Project {
   months: CalendarMonth[]
 }
 
-const MONTH_NAMES = [
-  'Enero',
-  'Febrero',
-  'Marzo',
-  'Abril',
-  'Mayo',
-  'Junio',
-  'Julio',
-  'Agosto',
-  'Septiembre',
-  'Octubre',
-  'Noviembre',
-  'Diciembre',
-]
-
 const STATUS_OPTIONS = [
-  { value: 'DRAFT', label: 'Draft' },
-  { value: 'IN_PROGRESS', label: 'In progress' },
-  { value: 'COMPLETED', label: 'Completed' },
+  { value: 'DRAFT', label: 'project.statusDraft' },
+  { value: 'IN_PROGRESS', label: 'project.statusInProgress' },
+  { value: 'COMPLETED', label: 'project.statusCompleted' },
 ]
 
 function getDaysInMonth(year: number, month: number): number {
@@ -54,12 +40,10 @@ function getFirstDayOfWeek(year: number, month: number, weekStartsOn: string): n
   return day // 0=Sun
 }
 
-const WEEKDAY_HEADERS_MON = ['L', 'M', 'X', 'J', 'V', 'S', 'D']
-const WEEKDAY_HEADERS_SUN = ['D', 'L', 'M', 'X', 'J', 'V', 'S']
-
 export default function ProjectPage() {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
+  const { t } = useTranslation()
   const [project, setProject] = useState<Project | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -72,7 +56,7 @@ export default function ProjectPage() {
         const { data } = await api.get(`/projects/${id}`)
         setProject(data.project)
       } catch {
-        setError('Proyecto no encontrado')
+        setError(t('project.notFound'))
       } finally {
         setLoading(false)
       }
@@ -86,7 +70,7 @@ export default function ProjectPage() {
       const { data } = await api.patch(`/projects/${project.id}`, { status })
       setProject(data.project)
     } catch {
-      setError('Error al actualizar el estado')
+      setError(t('project.errorUpdatingStatus'))
     }
   }
 
@@ -108,15 +92,19 @@ export default function ProjectPage() {
   if (error || !project) {
     return (
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 text-center">
-        <p className="text-neutral-600 mb-4">{error || 'Proyecto no encontrado'}</p>
+        <p className="text-neutral-600 mb-4">{error || t('project.notFound')}</p>
         <Link to="/" className="text-primary-600 hover:underline">
-          Volver al dashboard
+          {t('project.backToDashboard')}
         </Link>
       </div>
     )
   }
 
-  const weekdays = project.weekStartsOn === 'monday' ? WEEKDAY_HEADERS_MON : WEEKDAY_HEADERS_SUN
+  const monthNames = t('months', { returnObjects: true }) as string[]
+  const weekdays =
+    project.weekStartsOn === 'monday'
+      ? (t('weekdaysMon', { returnObjects: true }) as string[])
+      : (t('weekdaysSun', { returnObjects: true }) as string[])
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -126,7 +114,7 @@ export default function ProjectPage() {
           <button
             onClick={() => navigate('/')}
             className="text-neutral-400 hover:text-neutral-600 transition-colors"
-            title="Volver"
+            title={t('project.goBack')}
           >
             ←
           </button>
@@ -136,7 +124,7 @@ export default function ProjectPage() {
               {project.year}
               {project.templateId && (
                 <span className="ml-2 text-xs bg-primary-50 text-primary-600 px-1.5 py-0.5 rounded">
-                  📋 Con plantilla
+                  {'📋 ' + t('project.withTemplate')}
                 </span>
               )}
             </p>
@@ -144,10 +132,10 @@ export default function ProjectPage() {
         </div>
         <div className="flex items-center gap-3">
           <button onClick={() => setShowExport(true)} className="btn btn-primary text-sm">
-            📄 Exportar
+            {'📄 ' + t('project.export')}
           </button>
           <button onClick={() => setShowApplyTemplate(true)} className="btn btn-secondary text-sm">
-            📋 Aplicar plantilla
+            {'📋 ' + t('project.applyTemplate')}
           </button>
           <select
             value={project.status}
@@ -156,7 +144,7 @@ export default function ProjectPage() {
           >
             {STATUS_OPTIONS.map((opt) => (
               <option key={opt.value} value={opt.value}>
-                {opt.label}
+                {t(opt.label)}
               </option>
             ))}
           </select>
@@ -171,8 +159,8 @@ export default function ProjectPage() {
           className="bg-white rounded-lg border border-dashed border-primary-300 p-4 hover:shadow-md transition-shadow flex flex-col items-center justify-center min-h-[14rem]"
         >
           <span className="text-3xl mb-2">📖</span>
-          <h3 className="font-semibold text-primary-700 text-sm">Front cover</h3>
-          <p className="text-[10px] text-neutral-400 mt-1">Full A4 page</p>
+          <h3 className="font-semibold text-primary-700 text-sm">{t('project.frontCover')}</h3>
+          <p className="text-[10px] text-neutral-400 mt-1">{t('project.fullA4')}</p>
         </Link>
 
         {project.months.map((m) => {
@@ -189,10 +177,13 @@ export default function ProjectPage() {
             >
               <div className="flex items-center justify-between mb-3">
                 <h3 className="font-semibold text-neutral-800 text-sm">
-                  {MONTH_NAMES[m.month - 1]}
+                  {monthNames[m.month - 1]}
                 </h3>
                 {m.isCustomized && (
-                  <span className="w-2 h-2 rounded-full bg-primary-500" title="Customized" />
+                  <span
+                    className="w-2 h-2 rounded-full bg-primary-500"
+                    title={t('project.customized')}
+                  />
                 )}
               </div>
               {/* Mini calendar */}
@@ -224,8 +215,8 @@ export default function ProjectPage() {
           className="bg-white rounded-lg border border-dashed border-primary-300 p-4 hover:shadow-md transition-shadow flex flex-col items-center justify-center min-h-[14rem]"
         >
           <span className="text-3xl mb-2">📘</span>
-          <h3 className="font-semibold text-primary-700 text-sm">Back cover</h3>
-          <p className="text-[10px] text-neutral-400 mt-1">Full A4 page</p>
+          <h3 className="font-semibold text-primary-700 text-sm">{t('project.backCover')}</h3>
+          <p className="text-[10px] text-neutral-400 mt-1">{t('project.fullA4')}</p>
         </Link>
       </div>
 

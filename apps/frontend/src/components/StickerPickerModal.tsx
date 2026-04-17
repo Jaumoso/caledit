@@ -1,8 +1,9 @@
 import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 
 const EMOJI_CATEGORIES: { name: string; emojis: string[] }[] = [
   {
-    name: 'Favoritos',
+    name: 'stickerPicker.favorites',
     emojis: [
       '❤️',
       '⭐',
@@ -23,31 +24,31 @@ const EMOJI_CATEGORIES: { name: string; emojis: string[] }[] = [
     ],
   },
   {
-    name: 'Faces',
+    name: 'stickerPicker.faces',
     emojis: ['😀', '😊', '😍', '🥰', '😎', '🤩', '😇', '🥳', '😘', '☺️', '🤗', '😄'],
   },
   {
-    name: 'Animals',
+    name: 'stickerPicker.animals',
     emojis: ['🐶', '🐱', '🐰', '🦊', '🐻', '🐼', '🐨', '🐯', '🦁', '🐮', '🐷', '🐸'],
   },
   {
-    name: 'Nature',
+    name: 'stickerPicker.nature',
     emojis: ['🌺', '🌻', '🌷', '🌹', '🌼', '🍀', '🌿', '🍂', '🍁', '🌴', '🌳', '🌵'],
   },
   {
-    name: 'Food',
+    name: 'stickerPicker.food',
     emojis: ['🍎', '🍕', '🍰', '🎂', '☕', '🍷', '🍓', '🍒', '🍑', '🥂', '🧁', '🍫'],
   },
   {
-    name: 'Objects',
+    name: 'stickerPicker.objects',
     emojis: ['🎈', '🎁', '🎀', '🎊', '🏆', '🎯', '📸', '🎨', '✏️', '📅', '🔔', '💌'],
   },
   {
-    name: 'Travel',
+    name: 'stickerPicker.travel',
     emojis: ['✈️', '🚗', '⛵', '🏖️', '🗼', '🏰', '⛰️', '🌍', '🗺️', '🧳', '🏕️', '🎢'],
   },
   {
-    name: 'Symbols',
+    name: 'stickerPicker.symbols',
     emojis: ['❤️', '💛', '💚', '💙', '💜', '🤍', '🖤', '🤎', '💗', '💝', '♻️', '☮️'],
   },
 ]
@@ -59,6 +60,7 @@ interface StickerPickerModalProps {
 }
 
 export default function StickerPickerModal({ isOpen, onClose, onSelect }: StickerPickerModalProps) {
+  const { t } = useTranslation()
   const [activeCategory, setActiveCategory] = useState(0)
   const [search, setSearch] = useState('')
 
@@ -78,7 +80,7 @@ export default function StickerPickerModal({ isOpen, onClose, onSelect }: Sticke
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center justify-between px-4 py-3 border-b border-neutral-200">
-          <h2 className="font-semibold text-neutral-900">Stickers y emojis</h2>
+          <h2 className="font-semibold text-neutral-900">{t('stickerPicker.title')}</h2>
           <button onClick={onClose} className="text-neutral-400 hover:text-neutral-600 text-xl">
             ×
           </button>
@@ -88,7 +90,7 @@ export default function StickerPickerModal({ isOpen, onClose, onSelect }: Sticke
         <div className="px-4 py-2">
           <input
             type="text"
-            placeholder="Buscar emoji..."
+            placeholder={t('stickerPicker.search')}
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             className="w-full border border-neutral-200 rounded-md px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary-300"
@@ -108,7 +110,7 @@ export default function StickerPickerModal({ isOpen, onClose, onSelect }: Sticke
                     : 'bg-neutral-50 text-neutral-500 hover:bg-neutral-100'
                 }`}
               >
-                {cat.name}
+                {t(cat.name)}
               </button>
             ))}
           </div>

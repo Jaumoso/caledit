@@ -1,8 +1,9 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
 import { useParams, useNavigate, Link } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import api from '../lib/api'
 import type { GridConfig, DayCell, MonthData, Holiday, CalEvent, Saint } from '../lib/calendarTypes'
-import { DEFAULT_GRID_CONFIG, MONTH_NAMES, PAGE_WIDTH, PAGE_HEIGHT } from '../lib/calendarTypes'
+import { DEFAULT_GRID_CONFIG, PAGE_WIDTH, PAGE_HEIGHT } from '../lib/calendarTypes'
 import CalendarGrid from '../components/CalendarGrid'
 import GridPropertiesPanel from '../components/GridPropertiesPanel'
 import CellModal from '../components/CellModal'
@@ -21,6 +22,7 @@ const AUTOSAVE_INTERVAL = 30_000 // 30 seconds
 export default function MonthEditorPage() {
   const { projectId, monthId } = useParams<{ projectId: string; monthId: string }>()
   const navigate = useNavigate()
+  const { t } = useTranslation()
 
   const [monthData, setMonthData] = useState<MonthData | null>(null)
   const [gridConfig, setGridConfig] = useState<GridConfig>(DEFAULT_GRID_CONFIG)
@@ -73,7 +75,7 @@ export default function MonthEditorPage() {
         setEvents(data.events || [])
         setSaints(data.saints || [])
       } catch {
-        setError('No se pudo cargar el mes')
+        setError(t('editor.errorLoading'))
       } finally {
         setLoading(false)
       }
@@ -94,7 +96,7 @@ export default function MonthEditorPage() {
       setLastSaved(new Date())
       setDirty(false)
     } catch {
-      setError('Error al guardar')
+      setError(t('editor.errorSaving'))
     } finally {
       setSaving(false)
     }
@@ -212,7 +214,7 @@ export default function MonthEditorPage() {
       })
       setSelectedDay(null)
     } catch {
-      setError('Error al guardar la celda')
+      setError(t('editor.errorSavingCell'))
     }
   }
 
@@ -248,7 +250,7 @@ export default function MonthEditorPage() {
       <div className="flex flex-col items-center justify-center h-[calc(100vh-3.5rem)] gap-4">
         <p className="text-neutral-600">{error}</p>
         <Link to={`/projects/${projectId}`} className="text-primary-600 hover:underline">
-          Volver al proyecto
+          {t('editor.backToProjectLink')}
         </Link>
       </div>
     )
@@ -256,7 +258,8 @@ export default function MonthEditorPage() {
 
   if (!monthData) return null
 
-  const monthName = MONTH_NAMES[monthData.month - 1]
+  const monthNames = t('months', { returnObjects: true }) as string[]
+  const monthName = monthNames[monthData.month - 1]
   const selectedCell =
     selectedDay !== null ? (dayCells.find((c) => c.dayNumber === selectedDay) ?? null) : null
 
@@ -269,14 +272,14 @@ export default function MonthEditorPage() {
             to={`/projects/${projectId}`}
             className="text-neutral-400 hover:text-neutral-600 transition-colors text-sm"
           >
-            ← Proyecto
+            {t('editor.backToProject')}
           </Link>
           <div className="flex items-center gap-2">
             <button
               onClick={() => handleNavigateMonth(-1)}
               disabled={monthData.month === 1}
               className="text-neutral-400 hover:text-neutral-700 disabled:opacity-30 transition-colors"
-              title="Mes anterior"
+              title={t('editor.previousMonth')}
             >
               ◀
             </button>
@@ -287,7 +290,7 @@ export default function MonthEditorPage() {
               onClick={() => handleNavigateMonth(1)}
               disabled={monthData.month === 12}
               className="text-neutral-400 hover:text-neutral-700 disabled:opacity-30 transition-colors"
-              title="Mes siguiente"
+              title={t('editor.nextMonth')}
             >
               ▶
             </button>
@@ -297,24 +300,26 @@ export default function MonthEditorPage() {
           {error && <span className="text-xs text-red-500">{error}</span>}
           {lastSaved && (
             <span className="text-xs text-neutral-400">
-              Guardado:{' '}
-              {lastSaved.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })}
+              {t('common.saved') + ' '}
+              {lastSaved.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' })}
             </span>
           )}
-          {dirty && !saving && <span className="text-xs text-amber-500">Sin guardar</span>}
+          {dirty && !saving && (
+            <span className="text-xs text-amber-500">{t('common.unsaved')}</span>
+          )}
           <button
             onClick={save}
             disabled={saving || !dirty}
             className="btn btn-primary text-sm disabled:opacity-50"
           >
-            {saving ? 'Saving...' : 'Save'}
+            {saving ? t('common.saving') : t('common.save')}
           </button>
           <button
             onClick={() => setShowSaveTemplate(true)}
             className="btn btn-secondary text-sm"
-            title="Save current configuration as template"
+            title={t('editor.saveTemplate')}
           >
-            💾 Template
+            {t('editor.templateButton')}
           </button>
         </div>
       </div>
@@ -329,7 +334,7 @@ export default function MonthEditorPage() {
               : 'bg-neutral-100 text-neutral-600 hover:bg-neutral-200'
           }`}
         >
-          🎨 Decorate page
+          {t('editor.decoratePage')}
         </button>
         <button
           onClick={() => setEditorMode('grid')}
@@ -339,7 +344,7 @@ export default function MonthEditorPage() {
               : 'bg-neutral-100 text-neutral-600 hover:bg-neutral-200'
           }`}
         >
-          📅 Editar grid
+          {t('editor.editGrid')}
         </button>
 
         {editorMode === 'canvas' && (

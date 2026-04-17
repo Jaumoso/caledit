@@ -1,15 +1,17 @@
 import { useState, useEffect, useCallback } from 'react'
+import { useTranslation } from 'react-i18next'
 import api from '../lib/api'
 import type { CalEvent } from '../lib/calendarTypes'
-import { MONTH_NAMES } from '../lib/calendarTypes'
 
 const EVENT_TYPES = [
-  { value: 'BIRTHDAY', label: 'Birthday', icon: '🎂' },
-  { value: 'ANNIVERSARY', label: 'Anniversary', icon: '💍' },
-  { value: 'CUSTOM', label: 'Custom', icon: '📌' },
+  { value: 'BIRTHDAY', label: 'events.birthday', icon: '🎂' },
+  { value: 'ANNIVERSARY', label: 'events.anniversary', icon: '💍' },
+  { value: 'CUSTOM', label: 'events.custom', icon: '📌' },
 ] as const
 
 export default function EventsPage() {
+  const { t } = useTranslation()
+  const monthNames = t('months', { returnObjects: true }) as string[]
   const [events, setEvents] = useState<CalEvent[]>([])
   const [loading, setLoading] = useState(true)
   const [showForm, setShowForm] = useState(false)
@@ -31,7 +33,7 @@ export default function EventsPage() {
   }, [fetchEvents])
 
   const handleDelete = async (id: string) => {
-    if (!confirm('Delete this event?')) return
+    if (!confirm(t('events.confirmDelete'))) return
     try {
       await api.delete(`/events/${id}`)
       setEvents((prev) => prev.filter((e) => e.id !== id))
@@ -67,10 +69,8 @@ export default function EventsPage() {
     <div className="max-w-4xl mx-auto px-4 py-6">
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-2xl font-bold text-neutral-900">My events</h1>
-          <p className="text-sm text-neutral-500 mt-1">
-            Birthdays, anniversaries, and custom events that will appear on your calendars
-          </p>
+          <h1 className="text-2xl font-bold text-neutral-900">{t('events.title')}</h1>
+          <p className="text-sm text-neutral-500 mt-1">{t('events.description')}</p>
         </div>
         <button
           onClick={() => {
@@ -79,7 +79,7 @@ export default function EventsPage() {
           }}
           className="btn btn-primary"
         >
-          + New event
+          {t('events.newEvent')}
         </button>
       </div>
 
@@ -90,10 +90,8 @@ export default function EventsPage() {
       ) : events.length === 0 ? (
         <div className="text-center py-16">
           <p className="text-4xl mb-3">📅</p>
-          <p className="text-neutral-500">No events yet.</p>
-          <p className="text-sm text-neutral-400">
-            Add birthdays, anniversaries, and other events to have them appear automatically.
-          </p>
+          <p className="text-neutral-500">{t('events.noEvents')}</p>
+          <p className="text-sm text-neutral-400">{t('events.noEventsHint')}</p>
         </div>
       ) : (
         <div className="space-y-6">
@@ -102,7 +100,7 @@ export default function EventsPage() {
             .map((m) => (
               <div key={m}>
                 <h2 className="text-sm font-semibold text-neutral-700 uppercase tracking-wider mb-2">
-                  {MONTH_NAMES[m - 1]}
+                  {monthNames[m - 1]}
                 </h2>
                 <div className="bg-white rounded-lg border border-neutral-200 divide-y divide-neutral-100">
                   {grouped[m]
@@ -122,9 +120,9 @@ export default function EventsPage() {
                           <div>
                             <p className="text-sm font-medium text-neutral-900">{event.name}</p>
                             <p className="text-xs text-neutral-500">
-                              {MONTH_NAMES[event.month - 1]} {event.day}
+                              {monthNames[event.month - 1]} {event.day}
                               {event.isRecurring
-                                ? ' · Every year'
+                                ? t('events.everyYear')
                                 : event.year
                                   ? ` · ${event.year}`
                                   : ''}
@@ -177,6 +175,8 @@ function EventForm({
   onDone: () => void
   onClose: () => void
 }) {
+  const { t } = useTranslation()
+  const monthNames = t('months', { returnObjects: true }) as string[]
   const [name, setName] = useState(event?.name || '')
   const [day, setDay] = useState(event?.day || 1)
   const [month, setMonth] = useState(event?.month || 1)
@@ -217,7 +217,7 @@ function EventForm({
       }
       onDone()
     } catch {
-      setError('Error al guardar el evento')
+      setError(t('events.errorSaving'))
       setSaving(false)
     }
   }
@@ -230,18 +230,20 @@ function EventForm({
         onClick={(e) => e.stopPropagation()}
       >
         <h2 className="text-lg font-semibold text-neutral-900 mb-4">
-          {event ? 'Edit event' : 'New event'}
+          {event ? t('events.editEvent') : t('events.newEventTitle')}
         </h2>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           {/* Name */}
           <div>
-            <label className="block text-sm font-medium text-neutral-700 mb-1">Name</label>
+            <label className="block text-sm font-medium text-neutral-700 mb-1">
+              {t('common.name')}
+            </label>
             <input
               type="text"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              placeholder="Ana's birthday"
+              placeholder={t('events.eventNamePlaceholder')}
               className="w-full px-3 py-2 border border-neutral-300 rounded-md text-sm focus:ring-2 focus:ring-primary-500 outline-none"
               autoFocus
               required
@@ -251,26 +253,28 @@ function EventForm({
 
           {/* Type */}
           <div>
-            <label className="block text-sm font-medium text-neutral-700 mb-1">Type</label>
+            <label className="block text-sm font-medium text-neutral-700 mb-1">
+              {t('common.type')}
+            </label>
             <div className="flex gap-2">
               {(
                 [
-                  { value: 'BIRTHDAY', label: '🎂 Birthday' },
-                  { value: 'ANNIVERSARY', label: '💍 Anniversary' },
-                  { value: 'CUSTOM', label: '📌 Other' },
+                  { value: 'BIRTHDAY', label: t('events.typeBirthday') },
+                  { value: 'ANNIVERSARY', label: t('events.typeAnniversary') },
+                  { value: 'CUSTOM', label: t('events.typeOther') },
                 ] as const
-              ).map((t) => (
+              ).map((tp) => (
                 <button
-                  key={t.value}
+                  key={tp.value}
                   type="button"
-                  onClick={() => setType(t.value)}
+                  onClick={() => setType(tp.value)}
                   className={`px-3 py-1.5 text-xs rounded-full border transition-colors ${
-                    type === t.value
+                    type === tp.value
                       ? 'bg-primary-50 border-primary-300 text-primary-700'
                       : 'border-neutral-200 text-neutral-600 hover:bg-neutral-50'
                   }`}
                 >
-                  {t.label}
+                  {tp.label}
                 </button>
               ))}
             </div>
@@ -279,7 +283,9 @@ function EventForm({
           {/* Date */}
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="block text-sm font-medium text-neutral-700 mb-1">Day</label>
+              <label className="block text-sm font-medium text-neutral-700 mb-1">
+                {t('common.day')}
+              </label>
               <input
                 type="number"
                 min={1}
@@ -290,13 +296,15 @@ function EventForm({
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-neutral-700 mb-1">Month</label>
+              <label className="block text-sm font-medium text-neutral-700 mb-1">
+                {t('common.month')}
+              </label>
               <select
                 value={month}
                 onChange={(e) => setMonth(Number(e.target.value))}
                 className="w-full px-3 py-2 border border-neutral-300 rounded-md text-sm focus:ring-2 focus:ring-primary-500 outline-none"
               >
-                {MONTH_NAMES.map((m, i) => (
+                {monthNames.map((m, i) => (
                   <option key={i} value={i + 1}>
                     {m}
                   </option>
@@ -315,13 +323,15 @@ function EventForm({
               className="accent-primary-600"
             />
             <label htmlFor="recurring" className="text-sm text-neutral-700">
-              Repeats every year
+              {t('events.repeatsEveryYear')}
             </label>
           </div>
 
           {!isRecurring && (
             <div>
-              <label className="block text-sm font-medium text-neutral-700 mb-1">Year</label>
+              <label className="block text-sm font-medium text-neutral-700 mb-1">
+                {t('common.year')}
+              </label>
               <input
                 type="number"
                 min={2020}
@@ -335,7 +345,9 @@ function EventForm({
 
           {/* Color */}
           <div>
-            <label className="block text-sm font-medium text-neutral-700 mb-1">Color</label>
+            <label className="block text-sm font-medium text-neutral-700 mb-1">
+              {t('common.color')}
+            </label>
             <div className="flex gap-2">
               {DEFAULT_COLORS.map((c) => (
                 <button
@@ -354,7 +366,7 @@ function EventForm({
           {/* Icon */}
           <div>
             <label className="block text-sm font-medium text-neutral-700 mb-1">
-              Icon/emoji (optional)
+              {t('events.iconLabel')}
             </label>
             <input
               type="text"
@@ -374,14 +386,14 @@ function EventForm({
               onClick={onClose}
               className="px-4 py-2 text-sm text-neutral-600 hover:text-neutral-800 border border-neutral-300 rounded-md transition-colors"
             >
-              Cancel
+              {t('common.cancel')}
             </button>
             <button
               type="submit"
               disabled={saving || !name.trim()}
               className="btn btn-primary disabled:opacity-50"
             >
-              {saving ? 'Saving...' : event ? 'Save' : 'Create'}
+              {saving ? t('common.saving') : event ? t('common.save') : t('common.create')}
             </button>
           </div>
         </form>

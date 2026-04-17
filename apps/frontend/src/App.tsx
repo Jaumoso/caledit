@@ -1,5 +1,6 @@
 import { useEffect, Suspense, lazy } from 'react'
 import { Routes, Route, Navigate } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { useAuthStore } from './stores/authStore'
 import ProtectedRoute from './components/ProtectedRoute'
 import AppLayout from './components/AppLayout'
@@ -29,6 +30,7 @@ function PageLoader() {
 }
 
 function App() {
+  const { t } = useTranslation()
   const { isAuthenticated, checkAuth } = useAuthStore()
 
   useEffect(() => {
@@ -41,7 +43,7 @@ function App() {
       <div className="min-h-screen flex items-center justify-center bg-neutral-50">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600 mx-auto"></div>
-          <p className="mt-4 text-neutral-600">Loading...</p>
+          <p className="mt-4 text-neutral-600">{t('app.loading')}</p>
         </div>
       </div>
     )

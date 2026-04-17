@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import type { CanvasEditorHandle } from './CanvasEditor'
 
 interface BackgroundModalProps {
@@ -15,6 +16,7 @@ export default function BackgroundModal({
   onOpenAssetPicker,
 }: BackgroundModalProps) {
   const [color, setColor] = useState('#ffffff')
+  const { t } = useTranslation()
   const [gradientStart, setGradientStart] = useState('#ffffff')
   const [gradientEnd, setGradientEnd] = useState('#e2ddd6')
 
@@ -52,11 +54,13 @@ export default function BackgroundModal({
       onClick={onClose}
     >
       <div className="bg-white rounded-xl shadow-xl w-96 p-5" onClick={(e) => e.stopPropagation()}>
-        <h2 className="font-semibold text-neutral-900 mb-4">Page background</h2>
+        <h2 className="font-semibold text-neutral-900 mb-4">{t('background.title')}</h2>
 
         {/* Solid color */}
         <div className="mb-4">
-          <h3 className="text-xs font-semibold text-neutral-500 uppercase mb-2">Solid color</h3>
+          <h3 className="text-xs font-semibold text-neutral-500 uppercase mb-2">
+            {t('background.solidColor')}
+          </h3>
           <div className="flex items-center gap-3">
             <input
               type="color"
@@ -71,17 +75,21 @@ export default function BackgroundModal({
               className="border border-neutral-200 rounded px-2 py-1 text-sm w-24"
             />
             <button onClick={applyColor} className="btn btn-primary text-sm">
-              Aplicar
+              {t('common.apply')}
             </button>
           </div>
         </div>
 
         {/* Gradient */}
         <div className="mb-4">
-          <h3 className="text-xs font-semibold text-neutral-500 uppercase mb-2">Degradado</h3>
+          <h3 className="text-xs font-semibold text-neutral-500 uppercase mb-2">
+            {t('background.gradient')}
+          </h3>
           <div className="flex items-center gap-2 mb-2">
             <div>
-              <label className="text-[10px] text-neutral-400">Inicio</label>
+              <label className="text-[10px] text-neutral-400">
+                {t('background.gradientStart')}
+              </label>
               <input
                 type="color"
                 value={gradientStart}
@@ -90,7 +98,7 @@ export default function BackgroundModal({
               />
             </div>
             <div>
-              <label className="text-[10px] text-neutral-400">Fin</label>
+              <label className="text-[10px] text-neutral-400">{t('background.gradientEnd')}</label>
               <input
                 type="color"
                 value={gradientEnd}
@@ -103,14 +111,16 @@ export default function BackgroundModal({
               style={{ background: `linear-gradient(to bottom, ${gradientStart}, ${gradientEnd})` }}
             />
             <button onClick={applyGradient} className="btn btn-primary text-sm">
-              Aplicar
+              {t('common.apply')}
             </button>
           </div>
         </div>
 
         {/* Image bg */}
         <div className="mb-4">
-          <h3 className="text-xs font-semibold text-neutral-500 uppercase mb-2">Imagen de fondo</h3>
+          <h3 className="text-xs font-semibold text-neutral-500 uppercase mb-2">
+            {t('background.backgroundImage')}
+          </h3>
           <button
             onClick={() => {
               onClose()
@@ -118,13 +128,13 @@ export default function BackgroundModal({
             }}
             className="btn btn-secondary text-sm w-full"
           >
-            Seleccionar imagen de biblioteca
+            {t('background.selectFromLibrary')}
           </button>
         </div>
 
         <div className="flex justify-end pt-2 border-t border-neutral-100">
           <button onClick={onClose} className="btn btn-secondary text-sm">
-            Close
+            {t('common.close')}
           </button>
         </div>
       </div>

@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react'
+import { useTranslation } from 'react-i18next'
 import api from '../lib/api'
 
 interface Asset {
@@ -31,6 +32,7 @@ export default function AssetPickerModal({
   assetType = 'IMAGE',
   title,
 }: AssetPickerModalProps) {
+  const { t } = useTranslation()
   const [assets, setAssets] = useState<Asset[]>([])
   const [folders, setFolders] = useState<AssetFolder[]>([])
   const [currentFolder, setCurrentFolder] = useState<string | null>(null)
@@ -71,7 +73,10 @@ export default function AssetPickerModal({
         {/* Header */}
         <div className="flex items-center justify-between px-5 py-3 border-b border-neutral-200">
           <h2 className="font-semibold text-neutral-900">
-            {title || (assetType === 'STICKER' ? 'Seleccionar sticker' : 'Seleccionar imagen')}
+            {title ||
+              (assetType === 'STICKER'
+                ? t('assetPicker.selectSticker')
+                : t('assetPicker.selectImage'))}
           </h2>
           <button onClick={onClose} className="text-neutral-400 hover:text-neutral-600 text-xl">
             ×
@@ -82,7 +87,7 @@ export default function AssetPickerModal({
         <div className="px-5 py-3 border-b border-neutral-100 flex items-center gap-3">
           <input
             type="text"
-            placeholder="Buscar..."
+            placeholder={t('assetPicker.search')}
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             className="border border-neutral-200 rounded-md px-3 py-1.5 text-sm flex-1 focus:outline-none focus:ring-2 focus:ring-primary-300"
@@ -92,7 +97,7 @@ export default function AssetPickerModal({
               onClick={() => setCurrentFolder(null)}
               className="text-xs text-primary-600 hover:underline"
             >
-              ← Todas las carpetas
+              {t('assetPicker.allFolders')}
             </button>
           )}
         </div>
@@ -119,7 +124,9 @@ export default function AssetPickerModal({
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600" />
             </div>
           ) : assets.length === 0 ? (
-            <div className="text-center py-12 text-neutral-400 text-sm">No images found</div>
+            <div className="text-center py-12 text-neutral-400 text-sm">
+              {t('assetPicker.noImages')}
+            </div>
           ) : (
             <div className="grid grid-cols-4 gap-3">
               {assets.map((asset) => (

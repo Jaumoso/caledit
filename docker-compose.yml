@@ -1,22 +1,22 @@
 services:
   postgres:
     image: postgres:16-alpine
+    container_name: caledit-postgres
     environment:
       POSTGRES_DB: ${POSTGRES_DB:-calendapp}
       POSTGRES_USER: ${POSTGRES_USER:-calendapp}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD is required}
     volumes:
       - postgres_data:/var/lib/postgresql/data
-    ports:
-      - "5432:5432"
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U calendapp"]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-calendapp}"]
       interval: 10s
       timeout: 5s
       retries: 5
 
   backend:
     image: ghcr.io/${GHCR_OWNER:-jaumec}/caledit-backend:${APP_TAG:-latest}
+    container_name: caledit-backend
     environment:
       - DATABASE_URL=postgresql://${POSTGRES_USER:-calendapp}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-calendapp}?schema=public
       - NODE_ENV=production

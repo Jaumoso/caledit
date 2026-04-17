@@ -1,8 +1,10 @@
 import { useState, useEffect } from 'react'
+import { useTranslation } from 'react-i18next'
 
 const ONBOARDING_KEY = 'calendapp-onboarding-done'
 
 export default function OnboardingOverlay() {
+  const { t } = useTranslation()
   const [step, setStep] = useState(0)
   const [visible, setVisible] = useState(false)
 
@@ -21,28 +23,28 @@ export default function OnboardingOverlay() {
   const steps = [
     {
       icon: '👋',
-      title: 'Welcome to CalendApp!',
-      text: 'Create custom calendars with your own photos and designs, ready to print.',
+      title: t('onboarding.welcome'),
+      text: t('onboarding.welcomeText'),
     },
     {
       icon: '📅',
-      title: 'Create a project',
-      text: 'From "My calendars", create a new project. Each project includes 12 months with front and back covers.',
+      title: t('onboarding.createProject'),
+      text: t('onboarding.createProjectText'),
     },
     {
       icon: '🖼️',
-      title: 'Upload your photos',
-      text: 'Go to "Library" to upload images and stickers. You can use them in any month.',
+      title: t('onboarding.uploadPhotos'),
+      text: t('onboarding.uploadPhotosText'),
     },
     {
       icon: '🎨',
-      title: 'Design each page',
-      text: 'In the editor, add images, text, and stickers on an A4 canvas. Customize colors, fonts, and the calendar grid.',
+      title: t('onboarding.designPages'),
+      text: t('onboarding.designPagesText'),
     },
     {
       icon: '📄',
-      title: 'Export and print',
-      text: 'When you are done, export a high-quality PDF and print it.',
+      title: t('onboarding.exportPrint'),
+      text: t('onboarding.exportPrintText'),
     },
   ]
 
@@ -73,21 +75,21 @@ export default function OnboardingOverlay() {
         {/* Actions */}
         <div className="flex justify-between items-center px-6 py-4 border-t border-neutral-100 bg-neutral-50">
           <button onClick={dismiss} className="text-xs text-neutral-400 hover:text-neutral-600">
-            Skip
+            {t('onboarding.skip')}
           </button>
           <div className="flex gap-2">
             {step > 0 && (
               <button onClick={() => setStep((s) => s - 1)} className="btn btn-secondary text-sm">
-                Previous
+                {t('onboarding.previous')}
               </button>
             )}
             {step < steps.length - 1 ? (
               <button onClick={() => setStep((s) => s + 1)} className="btn btn-primary text-sm">
-                Next
+                {t('onboarding.next')}
               </button>
             ) : (
               <button onClick={dismiss} className="btn btn-primary text-sm">
-                Get started!
+                {t('onboarding.getStarted')}
               </button>
             )}
           </div>
