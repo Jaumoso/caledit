@@ -1,9 +1,9 @@
 ---
-description: 'Use when writing or modifying React components, pages, stores, styles, or frontend configuration in CalendApp.'
+description: 'Use when writing or modifying React components, pages, stores, styles, or frontend configuration in Kalenda.'
 applyTo: 'apps/frontend/src/**'
 ---
 
-# CalendApp Frontend — React & UI Conventions
+# Kalenda Frontend — React & UI Conventions
 
 ## Tailwind CSS v4
 
@@ -47,7 +47,7 @@ return <h1>{t('dashboard.title')}</h1>
 
 - Props typed as interfaces (not inline)
 - Callbacks named `onAction` (e.g., `onChange`, `onSave`, `onDelete`)
-- Types imported from `../lib/calendarTypes` or `@calendapp/shared`
+- Types imported from `../lib/calendarTypes` or `@kalenda/shared`
 
 ## Vite Proxy
 

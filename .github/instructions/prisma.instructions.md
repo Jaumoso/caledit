@@ -1,9 +1,9 @@
 ---
-description: 'Use when writing Prisma schema changes, migrations, database queries, or modifying the database layer in CalendApp.'
+description: 'Use when writing Prisma schema changes, migrations, database queries, or modifying the database layer in Kalenda.'
 applyTo: 'apps/backend/prisma/**'
 ---
 
-# CalendApp — Prisma & Database Conventions
+# Kalenda — Prisma & Database Conventions
 
 ## Prisma 7 with PrismaPg Adapter
 
@@ -59,5 +59,5 @@ export const prisma = new PrismaClient({ adapter })
 ## Dev Database
 
 - PostgreSQL 16 (Alpine) via docker-compose.dev.yml
-- Credentials: `calendapp:calendapp_password@localhost:5432/calendapp`
-- Seed: `npx tsx src/seed.ts` → admin@calendapp.com/admin123, maria@calendapp.com/maria123
+- Credentials: `kalenda:kalenda_password@localhost:5432/kalenda`
+- Seed: `npx tsx src/seed.ts` → admin@kalenda.app/admin123, maria@kalenda.app/maria123

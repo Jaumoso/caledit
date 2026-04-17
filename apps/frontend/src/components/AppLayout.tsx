@@ -32,7 +32,7 @@ export default function AppLayout() {
           <div className="flex items-center justify-between h-14">
             <div className="flex items-center gap-6">
               <Link to="/" className="text-lg font-bold text-primary-700">
-                CalendApp
+                Kalenda
               </Link>
               <nav className="flex gap-1">
                 {navLinks.map((link) => (

@@ -1,24 +1,24 @@
 services:
   postgres:
     image: postgres:16-alpine
-    container_name: caledit-postgres
+    container_name: kalenda-postgres
     environment:
-      POSTGRES_DB: ${POSTGRES_DB:-calendapp}
-      POSTGRES_USER: ${POSTGRES_USER:-calendapp}
+      POSTGRES_DB: ${POSTGRES_DB:-kalenda}
+      POSTGRES_USER: ${POSTGRES_USER:-kalenda}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD is required}
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-calendapp}"]
+      test: [ "CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-kalenda}" ]
       interval: 10s
       timeout: 5s
       retries: 5
 
   backend:
-    image: ghcr.io/${GHCR_OWNER:-jaumec}/caledit-backend:${APP_TAG:-latest}
-    container_name: caledit-backend
+    image: ghcr.io/${GHCR_OWNER:-jaumec}/kalenda-backend:${APP_TAG:-latest}
+    container_name: kalenda-backend
     environment:
-      - DATABASE_URL=postgresql://${POSTGRES_USER:-calendapp}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-calendapp}?schema=public
+      - DATABASE_URL=postgresql://${POSTGRES_USER:-kalenda}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-kalenda}?schema=public
       - NODE_ENV=production
       - COOKIE_SECRET=${COOKIE_SECRET:-default-secret-change-in-production}
       - JWT_SECRET=${JWT_SECRET:-default-jwt-secret-change-in-production}

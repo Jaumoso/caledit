@@ -18,7 +18,7 @@ applyTo:
   ]
 ---
 
-# CalendApp — Editor Architecture
+# Kalenda — Editor Architecture
 
 ## Page Layout
 

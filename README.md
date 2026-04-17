@@ -1,6 +1,6 @@
-# Caledit
+# Kalenda
 
-Caledit is a self-hosted web application for designing fully customizable wall calendars.
+Kalenda is a self-hosted web application for designing fully customizable wall calendars.
 Create 12-month calendars with photos, stickers, text, and visual styles, then export production-ready PDF/PNG files.
 
 ## Quick Start
@@ -21,8 +21,8 @@ pnpm dev
 
 ### Demo credentials
 
-- Admin: admin@calendapp.com / admin123
-- User: user@calendapp.com / user123
+- Admin: admin@kalenda.app / admin123
+- User: user@kalenda.app / user123
 
 ### API endpoints
 
@@ -110,8 +110,8 @@ pnpm build
 export GHCR_OWNER=YOUR_GITHUB_USER_OR_ORG
 export APP_TAG=v1.0.0
 
-export POSTGRES_DB=calendapp
-export POSTGRES_USER=calendapp
+export POSTGRES_DB=kalenda
+export POSTGRES_USER=kalenda
 export POSTGRES_PASSWORD=CHANGE_THIS_PASSWORD
 
 docker compose pull

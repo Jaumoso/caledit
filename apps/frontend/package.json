@@ -1,5 +1,5 @@
 {
-  "name": "@calendapp/frontend",
+  "name": "@kalenda/frontend",
   "version": "0.1.0",
   "private": true,
   "type": "module",
@@ -15,7 +15,7 @@
     "clean": "rm -rf dist"
   },
   "dependencies": {
-    "@calendapp/shared": "workspace:*",
+    "@kalenda/shared": "workspace:*",
     "@fontsource-variable/bitter": "^5.2.10",
     "@fontsource-variable/cabin": "^5.2.8",
     "@fontsource-variable/dm-sans": "^5.2.8",

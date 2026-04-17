@@ -1,6 +1,6 @@
 # ROADMAP.md — Plan de desarrollo
 
-## CalendApp
+## Kalenda
 
 **Versión:** 1.0  
 **Fecha:** Abril 2026
@@ -37,7 +37,7 @@
 - [ ] Verificar que nginx sirve el frontend y proxea `/api/*` al backend
 - [ ] Crear paquete `shared/` con tipos TypeScript base
 
-**Entregable:** `https://calendapp.tuservidor.com` muestra "Hola mundo" en producción.
+**Entregable:** `https://kalenda.tuservidor.com` muestra "Hola mundo" en producción.
 
 ---
 
@@ -345,7 +345,6 @@ La zona de collage (Fase 6) es la más compleja y puede venir después del MVP.
 
 ### Calendario y datos
 
-- Fases lunares en las celdas (🌑🌓🌕🌗)
 - Números de semana (columna lateral opcional)
 - Mini-calendario del mes anterior/siguiente en una esquina
 - Eventos recurrentes (cada año, cada mes, cada semana)

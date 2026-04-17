@@ -1,5 +1,5 @@
 {
-  "name": "@calendapp/backend",
+  "name": "@kalenda/backend",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -19,7 +19,7 @@
     "db:seed": "tsx src/seed.ts"
   },
   "dependencies": {
-    "@calendapp/shared": "workspace:*",
+    "@kalenda/shared": "workspace:*",
     "@fastify/cookie": "^11.0.2",
     "@fastify/cors": "^11.2.0",
     "@fastify/helmet": "^13.0.2",

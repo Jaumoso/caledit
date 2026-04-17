@@ -49,7 +49,7 @@ export default function LoginPage() {
               />
             </svg>
           </div>
-          <h2 className="mt-6 text-center text-3xl font-extrabold text-neutral-900">CalendApp</h2>
+          <h2 className="mt-6 text-center text-3xl font-extrabold text-neutral-900">Kalenda</h2>
           <p className="mt-2 text-center text-sm text-neutral-600">{t('auth.signInToAccount')}</p>
         </div>
 
@@ -186,9 +186,9 @@ export default function LoginPage() {
           <div className="text-center">
             <div className="text-sm text-neutral-600">{t('auth.demoCredentials')}</div>
             <div className="mt-2 text-xs text-neutral-500">
-              Admin: admin@calendapp.com / admin123
+              Admin: admin@kalenda.app / admin123
               <br />
-              User: user@calendapp.com / user123
+              User: user@kalenda.app / user123
             </div>
           </div>
         </form>

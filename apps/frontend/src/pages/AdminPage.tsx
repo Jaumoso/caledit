@@ -104,7 +104,7 @@ export default function AdminPage() {
       <header className="bg-surface shadow-sm border-b border-neutral-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
           <div>
-            <h1 className="text-2xl font-bold text-neutral-900">CalendApp</h1>
+            <h1 className="text-2xl font-bold text-neutral-900">Kalenda</h1>
             <p className="text-sm text-neutral-500">{t('admin.title')}</p>
           </div>
           <div className="flex items-center gap-4">

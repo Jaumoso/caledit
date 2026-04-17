@@ -1,5 +1,5 @@
 /**
- * Puppeteer rendering service for CalendApp.
+ * Puppeteer rendering service for Kalenda.
  * HTTP API that captures web pages as screenshots.
  * Used by the backend to render calendar months for PDF/PNG export.
  */

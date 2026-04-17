@@ -65,7 +65,7 @@ importers:
 
   apps/backend:
     dependencies:
-      '@calendapp/shared':
+      '@kalenda/shared':
         specifier: workspace:*
         version: link:../../packages/shared
       '@fastify/cookie':
@@ -150,7 +150,7 @@ importers:
 
   apps/frontend:
     dependencies:
-      '@calendapp/shared':
+      '@kalenda/shared':
         specifier: workspace:*
         version: link:../../packages/shared
       '@fontsource-variable/bitter':

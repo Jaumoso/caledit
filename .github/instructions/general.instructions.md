@@ -1,14 +1,14 @@
 ---
-description: 'Use when working on any file in CalendApp. Covers monorepo structure, shared package conventions, and general project rules.'
+description: 'Use when working on any file in Kalenda. Covers monorepo structure, shared package conventions, and general project rules.'
 applyTo: '**'
 ---
 
-# CalendApp — General Conventions
+# Kalenda — General Conventions
 
 ## Monorepo Structure
 
 - pnpm workspaces: `apps/backend`, `apps/frontend`, `packages/shared`
-- Shared types and Zod schemas live in `@calendapp/shared` — import from there, never duplicate
+- Shared types and Zod schemas live in `@kalenda/shared` — import from there, never duplicate
 - Reference shared package as `workspace:*` in package.json
 
 ## Language & i18n

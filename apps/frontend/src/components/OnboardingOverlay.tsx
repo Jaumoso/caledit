@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Hand, Calendar, Image, Paintbrush, FileDown } from 'lucide-react'
 
-const ONBOARDING_KEY = 'calendapp-onboarding-done'
+const ONBOARDING_KEY = 'kalenda-onboarding-done'
 
 export default function OnboardingOverlay() {
   const { t } = useTranslation()

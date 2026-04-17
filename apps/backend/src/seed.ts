@@ -9,10 +9,10 @@ async function main() {
   // Create admin user
   const adminPassword = await bcrypt.hash('admin123', 12)
   const admin = await prisma.user.upsert({
-    where: { email: 'admin@calendapp.com' },
+    where: { email: 'admin@kalenda.app' },
     update: {},
     create: {
-      email: 'admin@calendapp.com',
+      email: 'admin@kalenda.app',
       name: 'Administrator',
       password: adminPassword,
       role: 'ADMIN',
@@ -22,10 +22,10 @@ async function main() {
   // Create demo user
   const userPassword = await bcrypt.hash('user123', 12)
   const user = await prisma.user.upsert({
-    where: { email: 'user@calendapp.com' },
+    where: { email: 'user@kalenda.app' },
     update: {},
     create: {
-      email: 'user@calendapp.com',
+      email: 'user@kalenda.app',
       name: 'Demo User',
       password: userPassword,
       role: 'USER',

@@ -1,5 +1,5 @@
 {
-  "name": "@calendapp/puppeteer-service",
+  "name": "@kalenda/puppeteer-service",
   "version": "0.1.0",
   "private": true,
   "dependencies": {

@@ -1,9 +1,9 @@
 ---
-description: 'Use when writing or modifying Fastify routes, backend API handlers, authentication logic, or server configuration in CalendApp.'
+description: 'Use when writing or modifying Fastify routes, backend API handlers, authentication logic, or server configuration in Kalenda.'
 applyTo: 'apps/backend/src/**'
 ---
 
-# CalendApp Backend — Fastify & API Conventions
+# Kalenda Backend — Fastify & API Conventions
 
 ## Route Structure
 
@@ -26,7 +26,7 @@ if (!parsed.success) {
 }
 ```
 
-- Import schemas from `@calendapp/shared`
+- Import schemas from `@kalenda/shared`
 - Separate `create` (required fields) and `update` (optional fields) schemas
 
 ## Ownership Pattern
