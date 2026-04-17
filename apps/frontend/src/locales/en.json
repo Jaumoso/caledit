@@ -286,6 +286,8 @@
     "gridOpacity": "General grid opacity: {{value}}%",
     "gridOpacityHint": "Controls the transparency of the whole table over the page background",
     "borders": "Borders",
+    "outerBorder": "Outer border",
+    "innerBorder": "Inner borders",
     "thickness": "Thickness",
     "style": "Style",
     "styleSolid": "Solid",
@@ -313,7 +315,15 @@
     "showHolidays": "Show holidays",
     "holidayColor": "Holiday color",
     "showEvents": "Show events",
-    "showNameDay": "Show name day"
+    "showNameDay": "Show name day",
+    "monthTitle": "Month name",
+    "monthTitleShow": "Show month name",
+    "monthTitlePosition": "Position",
+    "monthTitlePositionTop": "Top",
+    "monthTitlePositionBottom": "Bottom",
+    "monthTitleAlignLabel": "Alignment",
+    "monthTitleBgColor": "Background color",
+    "monthTitleUppercase": "Uppercase"
   },
   "objectProps": {
     "noSelection": "Select an element to view its properties",

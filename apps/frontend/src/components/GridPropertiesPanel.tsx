@@ -117,9 +117,9 @@ export default function GridPropertiesPanel({ config, onChange }: Props) {
         </div>
       </section>
 
-      {/* Borders */}
+      {/* Outer border */}
       <section>
-        <h4 className="text-xs font-medium text-neutral-600 mb-2">{t('grid.borders')}</h4>
+        <h4 className="text-xs font-medium text-neutral-600 mb-2">{t('grid.outerBorder')}</h4>
         <ColorPicker
           label={t('common.color')}
           color={config.borderColor}
@@ -167,6 +167,160 @@ export default function GridPropertiesPanel({ config, onChange }: Props) {
             className="w-full accent-primary-500"
           />
         </div>
+      </section>
+
+      {/* Inner borders */}
+      <section>
+        <h4 className="text-xs font-medium text-neutral-600 mb-2">{t('grid.innerBorder')}</h4>
+        <ColorPicker
+          label={t('common.color')}
+          color={config.innerBorderColor}
+          onChange={(c) => update('innerBorderColor', c)}
+        />
+        <div className="mt-2 flex gap-2">
+          <div className="flex-1">
+            <label className="text-xs text-neutral-500 block mb-1">{t('grid.thickness')}</label>
+            <select
+              value={config.innerBorderWidth}
+              onChange={(e) => update('innerBorderWidth', Number(e.target.value))}
+              className="w-full text-xs border border-neutral-300 rounded px-2 py-1 outline-none focus:ring-1 focus:ring-primary-500"
+            >
+              {[0, 1, 2, 3].map((w) => (
+                <option key={w} value={w}>
+                  {w}px
+                </option>
+              ))}
+            </select>
+          </div>
+          <div className="flex-1">
+            <label className="text-xs text-neutral-500 block mb-1">{t('grid.style')}</label>
+            <select
+              value={config.innerBorderStyle}
+              onChange={(e) =>
+                update('innerBorderStyle', e.target.value as GridConfig['innerBorderStyle'])
+              }
+              className="w-full text-xs border border-neutral-300 rounded px-2 py-1 outline-none focus:ring-1 focus:ring-primary-500"
+            >
+              <option value="solid">{t('grid.styleSolid')}</option>
+              <option value="dashed">{t('grid.styleDashed')}</option>
+              <option value="dotted">{t('grid.styleDotted')}</option>
+              <option value="none">{t('grid.styleNone')}</option>
+            </select>
+          </div>
+        </div>
+      </section>
+
+      {/* Month title */}
+      <section>
+        <h4 className="text-xs font-medium text-neutral-600 mb-2">{t('grid.monthTitle')}</h4>
+        <label className="flex items-center gap-2 text-xs text-neutral-700 mb-2">
+          <input
+            type="checkbox"
+            checked={config.monthTitleShow}
+            onChange={(e) => update('monthTitleShow', e.target.checked)}
+            className="accent-primary-600"
+          />
+          {t('grid.monthTitleShow')}
+        </label>
+        {config.monthTitleShow && (
+          <>
+            <div className="flex gap-2 mb-2">
+              <div className="flex-1">
+                <label className="text-xs text-neutral-500 block mb-1">
+                  {t('grid.monthTitlePosition')}
+                </label>
+                <select
+                  value={config.monthTitlePosition}
+                  onChange={(e) =>
+                    update('monthTitlePosition', e.target.value as GridConfig['monthTitlePosition'])
+                  }
+                  className="w-full text-xs border border-neutral-300 rounded px-2 py-1 outline-none focus:ring-1 focus:ring-primary-500"
+                >
+                  <option value="top">{t('grid.monthTitlePositionTop')}</option>
+                  <option value="bottom">{t('grid.monthTitlePositionBottom')}</option>
+                </select>
+              </div>
+              <div className="flex-1">
+                <label className="text-xs text-neutral-500 block mb-1">
+                  {t('grid.monthTitleAlignLabel')}
+                </label>
+                <div className="flex gap-1">
+                  {(['left', 'center', 'right'] as const).map((a) => {
+                    const icons = { left: '⫷', center: '⫶', right: '⫸' }
+                    return (
+                      <button
+                        key={a}
+                        onClick={() => update('monthTitleAlign', a)}
+                        className={`flex-1 text-sm py-1 rounded border transition-colors ${
+                          config.monthTitleAlign === a
+                            ? 'bg-primary-100 border-primary-400 text-primary-700'
+                            : 'border-neutral-300 text-neutral-500 hover:bg-neutral-100'
+                        }`}
+                        title={a}
+                      >
+                        {icons[a]}
+                      </button>
+                    )
+                  })}
+                </div>
+              </div>
+            </div>
+            <FontSelector
+              label={t('grid.font')}
+              value={config.monthTitleFontFamily}
+              onChange={(f) => update('monthTitleFontFamily', f)}
+            />
+            <div className="mt-2 flex gap-2">
+              <div className="flex-1">
+                <label className="text-xs text-neutral-500 block mb-1">{t('grid.size')}</label>
+                <input
+                  type="number"
+                  min={10}
+                  max={72}
+                  value={config.monthTitleFontSize}
+                  onChange={(e) => update('monthTitleFontSize', Number(e.target.value))}
+                  className="w-full text-xs border border-neutral-300 rounded px-2 py-1 outline-none focus:ring-1 focus:ring-primary-500"
+                />
+              </div>
+              <div className="flex-1">
+                <label className="text-xs text-neutral-500 block mb-1">{t('grid.weight')}</label>
+                <select
+                  value={config.monthTitleFontWeight}
+                  onChange={(e) =>
+                    update('monthTitleFontWeight', e.target.value as 'normal' | 'bold')
+                  }
+                  className="w-full text-xs border border-neutral-300 rounded px-2 py-1 outline-none focus:ring-1 focus:ring-primary-500"
+                >
+                  <option value="normal">{t('grid.weightNormal')}</option>
+                  <option value="bold">{t('grid.weightBold')}</option>
+                </select>
+              </div>
+            </div>
+            <div className="mt-2">
+              <ColorPicker
+                label={t('common.color')}
+                color={config.monthTitleFontColor}
+                onChange={(c) => update('monthTitleFontColor', c)}
+              />
+            </div>
+            <div className="mt-2">
+              <ColorPicker
+                label={t('grid.monthTitleBgColor')}
+                color={config.monthTitleBgColor}
+                onChange={(c) => update('monthTitleBgColor', c)}
+              />
+            </div>
+            <label className="flex items-center gap-2 text-xs text-neutral-700 mt-2">
+              <input
+                type="checkbox"
+                checked={config.monthTitleUppercase}
+                onChange={(e) => update('monthTitleUppercase', e.target.checked)}
+                className="accent-primary-600"
+              />
+              {t('grid.monthTitleUppercase')}
+            </label>
+          </>
+        )}
       </section>
 
       {/* Day numbers */}

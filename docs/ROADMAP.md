@@ -332,10 +332,52 @@ La zona de collage (Fase 6) es la más compleja y puede venir después del MVP.
 
 ## Ideas para v2 (post-MVP)
 
-- Portada y contraportada
-- Vista previa de impresión (simulación física)
+### Editor visual
+
+- Máscaras de recorte para imágenes (círculo, corazón, estrella, hexágono)
+- Marcos/bordes decorativos para fotos (polaroid, rasgado, sombra)
+- Formas básicas (rectángulos, círculos, líneas, flechas)
+- Collage automático: layouts predefinidos para la zona de fotos (1 foto, 2 lado a lado, mosaico…)
+- Sombra y resplandor en objetos (drop shadow, glow)
+- Bloquear objetos para evitar moverlos accidentalmente
+- Multi-selección y agrupar/desagrupar objetos
+- Texto con contorno (stroke) y degradado
 - Copiar/pegar elementos entre meses
 - Guías de alineación (snap)
+
+### Calendario y datos
+
+- Fases lunares en las celdas (🌑🌓🌕🌗)
+- Números de semana (columna lateral opcional)
+- Mini-calendario del mes anterior/siguiente en una esquina
+- Eventos recurrentes (cada año, cada mes, cada semana)
+- Importar eventos desde Google Calendar / archivo .ics
+- Cuenta atrás a un evento destacado ("Faltan X días para…")
 - Festivos internacionales
-- Modo oscuro
+
+### Exportación e impresión
+
+- Vista previa de impresión (simulación física)
+- Más tamaños de papel (A3, Letter, A5 — calendario de escritorio)
+- Marcas de corte y sangrado (bleed) para impresión profesional
+- Exportar meses individuales (no solo el calendario completo)
+- Portada y contraportada personalizadas
+- Exportar como imágenes sueltas (para WhatsApp, redes sociales)
+- Calendario de pared vs. calendario de sobremesa (layouts diferentes)
+
+### Plantillas y contenido
+
+- Galería de temas estacionales (Navidad, verano, floral, minimalista…)
+- Packs de stickers temáticos descargables
+- Integración con bancos de imágenes gratuitos (Unsplash/Pexels)
+- Generar sugerencias de diseño con IA a partir de las fotos subidas
+
+### UX y productividad
+
 - Compartir calendario como enlace de solo lectura
+- Atajos de teclado configurables
+- Panel de historial visual (ver snapshots de versiones anteriores)
+- Duplicar mes con todo su contenido a otro mes
+- "Aplicar estilo" — copiar solo la configuración visual (sin fotos) de un mes a otro
+- Vista de año completo en miniatura (bird's eye view)
+- Modo presentación: ver el calendario pasando meses como slideshow

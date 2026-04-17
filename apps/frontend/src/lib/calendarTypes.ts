@@ -12,6 +12,9 @@ export interface GridConfig {
   borderWidth: number
   borderStyle: 'solid' | 'dashed' | 'dotted' | 'none'
   borderRadius: number
+  innerBorderColor: string
+  innerBorderWidth: number
+  innerBorderStyle: 'solid' | 'dashed' | 'dotted' | 'none'
   dayFontFamily: string
   dayFontSize: number
   dayFontColor: string
@@ -23,6 +26,15 @@ export interface GridConfig {
   headerFontColor: string
   headerBgColor: string
   headerFormat: 'short' | 'medium' | 'long'
+  monthTitleShow: boolean
+  monthTitleFontFamily: string
+  monthTitleFontSize: number
+  monthTitleFontColor: string
+  monthTitleFontWeight: 'normal' | 'bold'
+  monthTitleAlign: 'left' | 'center' | 'right'
+  monthTitlePosition: 'top' | 'bottom'
+  monthTitleBgColor: string
+  monthTitleUppercase: boolean
   showHolidays: boolean
   holidayBgColor: string
   showSaints: boolean
@@ -127,6 +139,9 @@ export const DEFAULT_GRID_CONFIG: GridConfig = {
   borderWidth: 1,
   borderStyle: 'solid',
   borderRadius: 8,
+  innerBorderColor: '#E2DDD6',
+  innerBorderWidth: 1,
+  innerBorderStyle: 'solid',
   dayFontFamily: 'Inter Variable',
   dayFontSize: 14,
   dayFontColor: '#1A1A1A',
@@ -138,6 +153,15 @@ export const DEFAULT_GRID_CONFIG: GridConfig = {
   headerFontColor: '#6B6560',
   headerBgColor: '#F8F7F4',
   headerFormat: 'short',
+  monthTitleShow: true,
+  monthTitleFontFamily: 'Inter Variable',
+  monthTitleFontSize: 24,
+  monthTitleFontColor: '#1A1A1A',
+  monthTitleFontWeight: 'bold',
+  monthTitleAlign: 'center',
+  monthTitlePosition: 'top',
+  monthTitleBgColor: '#ECE7D8',
+  monthTitleUppercase: false,
   showHolidays: true,
   holidayBgColor: '#FECACA',
   showSaints: false,

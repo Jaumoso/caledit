@@ -12,6 +12,7 @@ import {
   getFirstDayOfWeek,
   isWeekend,
   getWeekdayHeaders,
+  getMonthNames,
 } from '../lib/calendarTypes'
 
 interface Props {
@@ -53,6 +54,8 @@ export default function CalendarGrid({
   const daysInMonth = getDaysInMonth(year, month)
   const firstDay = getFirstDayOfWeek(year, month, weekStartsOn)
   const weekdays = getWeekdayHeaders(weekStartsOn, config.headerFormat)
+  const monthNames = getMonthNames()
+  const monthTitle = monthNames[month - 1] || ''
   const cellMap = new Map(dayCells.map((c) => [c.dayNumber, c]))
   const holidayMap = new Map<number, Holiday[]>()
   const eventMap = new Map<number, CalEvent[]>()
@@ -75,10 +78,15 @@ export default function CalendarGrid({
   const totalCells = firstDay + daysInMonth
   const rows = Math.ceil(totalCells / 7)
 
-  const borderStyle =
+  const outerBorder =
     config.borderStyle === 'none'
       ? undefined
       : `${config.borderWidth}px ${config.borderStyle} ${config.borderColor}`
+
+  const innerBorder =
+    config.innerBorderStyle === 'none'
+      ? undefined
+      : `${config.innerBorderWidth}px ${config.innerBorderStyle} ${config.innerBorderColor}`
 
   return (
     <div
@@ -87,10 +95,29 @@ export default function CalendarGrid({
         backgroundColor: config.bgColor,
         opacity: config.bgOpacity / 100,
         borderRadius: `${config.borderRadius}px`,
+        border: outerBorder,
       }}
     >
+      {/* Month title (top) */}
+      {config.monthTitleShow && config.monthTitlePosition === 'top' && (
+        <div
+          className="shrink-0 px-3 py-2 select-none"
+          style={{
+            fontFamily: config.monthTitleFontFamily,
+            fontSize: `${config.monthTitleFontSize}px`,
+            color: config.monthTitleFontColor,
+            fontWeight: config.monthTitleFontWeight,
+            textAlign: config.monthTitleAlign,
+            textTransform: config.monthTitleUppercase ? 'uppercase' : 'none',
+            backgroundColor: config.monthTitleBgColor,
+          }}
+        >
+          {monthTitle}
+        </div>
+      )}
+
       {/* Weekday headers */}
-      <div className="grid grid-cols-7 shrink-0" style={{ borderBottom: borderStyle }}>
+      <div className="grid grid-cols-7 shrink-0" style={{ borderBottom: innerBorder }}>
         {weekdays.map((day, i) => (
           <div
             key={i}
@@ -100,7 +127,7 @@ export default function CalendarGrid({
               fontSize: `${config.headerFontSize}px`,
               color: config.headerFontColor,
               backgroundColor: config.headerBgColor,
-              borderRight: i < 6 ? borderStyle : undefined,
+              borderRight: i < 6 ? innerBorder : undefined,
             }}
           >
             {day}
@@ -114,7 +141,7 @@ export default function CalendarGrid({
           <div
             key={row}
             className="grid grid-cols-7 flex-1"
-            style={{ borderBottom: row < rows - 1 ? borderStyle : undefined }}
+            style={{ borderBottom: row < rows - 1 ? innerBorder : undefined }}
           >
             {Array.from({ length: 7 }, (_, col) => {
               const cellIndex = row * 7 + col
@@ -142,7 +169,7 @@ export default function CalendarGrid({
                   } overflow-hidden`}
                   style={{
                     backgroundColor: cellBg || undefined,
-                    borderRight: col < 6 ? borderStyle : undefined,
+                    borderRight: col < 6 ? innerBorder : undefined,
                   }}
                   onClick={() => isValid && onCellClick(dayNumber)}
                 >
@@ -257,6 +284,24 @@ export default function CalendarGrid({
           </div>
         ))}
       </div>
+
+      {/* Month title (bottom) */}
+      {config.monthTitleShow && config.monthTitlePosition === 'bottom' && (
+        <div
+          className="shrink-0 px-3 py-2 select-none"
+          style={{
+            fontFamily: config.monthTitleFontFamily,
+            fontSize: `${config.monthTitleFontSize}px`,
+            color: config.monthTitleFontColor,
+            fontWeight: config.monthTitleFontWeight,
+            textAlign: config.monthTitleAlign,
+            textTransform: config.monthTitleUppercase ? 'uppercase' : 'none',
+            backgroundColor: config.monthTitleBgColor,
+          }}
+        >
+          {monthTitle}
+        </div>
+      )}
     </div>
   )
 }

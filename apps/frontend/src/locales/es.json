@@ -286,6 +286,8 @@
     "gridOpacity": "Opacidad general del grid: {{value}}%",
     "gridOpacityHint": "Controla la transparencia de toda la tabla sobre el fondo de la página",
     "borders": "Bordes",
+    "outerBorder": "Borde exterior",
+    "innerBorder": "Bordes interiores",
     "thickness": "Grosor",
     "style": "Estilo",
     "styleSolid": "Sólido",
@@ -313,7 +315,15 @@
     "showHolidays": "Mostrar festivos",
     "holidayColor": "Color de festivo",
     "showEvents": "Mostrar eventos",
-    "showNameDay": "Mostrar santo"
+    "showNameDay": "Mostrar santo",
+    "monthTitle": "Nombre del mes",
+    "monthTitleShow": "Mostrar nombre del mes",
+    "monthTitlePosition": "Posición",
+    "monthTitlePositionTop": "Arriba",
+    "monthTitlePositionBottom": "Abajo",
+    "monthTitleAlignLabel": "Alineación",
+    "monthTitleBgColor": "Color de fondo",
+    "monthTitleUppercase": "Mayúsculas"
   },
   "objectProps": {
     "noSelection": "Selecciona un elemento para ver sus propiedades",

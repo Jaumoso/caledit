@@ -11,6 +11,9 @@ const gridConfigSchema = z.object({
   borderWidth: z.number().min(0).max(10).optional(),
   borderStyle: z.enum(['solid', 'dashed', 'dotted', 'none']).optional(),
   borderRadius: z.number().min(0).max(24).optional(),
+  innerBorderColor: z.string().optional(),
+  innerBorderWidth: z.number().min(0).max(10).optional(),
+  innerBorderStyle: z.enum(['solid', 'dashed', 'dotted', 'none']).optional(),
   dayFontFamily: z.string().optional(),
   dayFontSize: z.number().min(8).max(72).optional(),
   dayFontColor: z.string().optional(),
@@ -34,6 +37,15 @@ const gridConfigSchema = z.object({
   headerFontColor: z.string().optional(),
   headerBgColor: z.string().optional(),
   headerFormat: z.enum(['short', 'medium', 'long']).optional(),
+  monthTitleShow: z.boolean().optional(),
+  monthTitleFontFamily: z.string().optional(),
+  monthTitleFontSize: z.number().min(10).max(72).optional(),
+  monthTitleFontColor: z.string().optional(),
+  monthTitleFontWeight: z.enum(['normal', 'bold']).optional(),
+  monthTitleAlign: z.enum(['left', 'center', 'right']).optional(),
+  monthTitlePosition: z.enum(['top', 'bottom']).optional(),
+  monthTitleBgColor: z.string().optional(),
+  monthTitleUppercase: z.boolean().optional(),
 })
 
 const updateMonthSchema = z.object({
