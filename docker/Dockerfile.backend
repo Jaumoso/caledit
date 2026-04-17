@@ -45,12 +45,14 @@ RUN npm install -g pnpm && pnpm install --filter @kalenda/backend... --prod --fr
     cd apps/backend && npx prisma generate
 
 # Copy built files
-COPY --from=builder /app/apps/backend/dist ./dist
-COPY --from=builder /app/apps/frontend/dist ./frontend/dist
+COPY --from=builder /app/apps/backend/dist ./apps/backend/dist
+COPY --from=builder /app/apps/frontend/dist ./apps/backend/frontend/dist
 COPY --from=builder /app/packages/shared/dist ./packages/shared/dist
 
 # Create data directories
 RUN mkdir -p /data/uploads /data/exports
+
+WORKDIR /app/apps/backend
 
 # Expose port
 EXPOSE 3000
