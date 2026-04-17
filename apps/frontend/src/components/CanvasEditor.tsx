@@ -252,6 +252,7 @@ interface CanvasEditorProps {
   onModified?: () => void
   onSelectionChange?: (obj: fabric.FabricObject | null) => void
   onReady?: () => void
+  onZoomChange?: (zoom: number) => void
 }
 
 const CANVAS_WIDTH = PAGE_WIDTH
@@ -268,7 +269,14 @@ function canvasToJSON(canvas: fabric.Canvas) {
 
 const CanvasEditor = forwardRef<CanvasEditorHandle, CanvasEditorProps>(
   (
-    { width = CANVAS_WIDTH, height = CANVAS_HEIGHT, onModified, onSelectionChange, onReady },
+    {
+      width = CANVAS_WIDTH,
+      height = CANVAS_HEIGHT,
+      onModified,
+      onSelectionChange,
+      onReady,
+      onZoomChange,
+    },
     ref
   ) => {
     const wrapperRef = useRef<HTMLDivElement>(null)
@@ -276,9 +284,19 @@ const CanvasEditor = forwardRef<CanvasEditorHandle, CanvasEditorProps>(
     const historyRef = useRef<string[]>([])
     const historyIndexRef = useRef(-1)
     const isLoadingRef = useRef(false)
+    const zoomRef = useRef(1)
     const [zoom, setZoom] = useState(1)
     const [canUndo, setCanUndo] = useState(false)
     const [canRedo, setCanRedo] = useState(false)
+
+    const applyZoom = useCallback(
+      (newZoom: number) => {
+        zoomRef.current = newZoom
+        setZoom(newZoom)
+        onZoomChange?.(newZoom)
+      },
+      [onZoomChange]
+    )
 
     const saveHistory = useCallback(() => {
       if (isLoadingRef.current) return
@@ -581,24 +599,13 @@ const CanvasEditor = forwardRef<CanvasEditorHandle, CanvasEditorProps>(
         canUndo,
         canRedo,
         zoomIn: () => {
-          const canvas = fabricRef.current
-          if (!canvas) return
-          const newZoom = Math.min(zoom * 1.2, 3)
-          canvas.setZoom(newZoom)
-          setZoom(newZoom)
+          applyZoom(Math.min(zoomRef.current * 1.2, 3))
         },
         zoomOut: () => {
-          const canvas = fabricRef.current
-          if (!canvas) return
-          const newZoom = Math.max(zoom / 1.2, 0.3)
-          canvas.setZoom(newZoom)
-          setZoom(newZoom)
+          applyZoom(Math.max(zoomRef.current / 1.2, 0.3))
         },
         zoomReset: () => {
-          const canvas = fabricRef.current
-          if (!canvas) return
-          canvas.setZoom(1)
-          setZoom(1)
+          applyZoom(1)
         },
         zoom,
         bringForward: () => {
@@ -695,7 +702,16 @@ const CanvasEditor = forwardRef<CanvasEditorHandle, CanvasEditorProps>(
           return dataUrl
         },
       }),
-      [zoom, canUndo, canRedo, saveHistory, loadHistoryState, onModified, onSelectionChange]
+      [
+        zoom,
+        canUndo,
+        canRedo,
+        saveHistory,
+        loadHistoryState,
+        onModified,
+        onSelectionChange,
+        applyZoom,
+      ]
     )
 
     return (

@@ -40,6 +40,7 @@ export default function CoverEditorPage() {
   const canvasJsonRef = useRef<object | null>(null)
   const [selectedObject, setSelectedObject] = useState<import('fabric').FabricObject | null>(null)
   const [canvasRefreshKey, setCanvasRefreshKey] = useState(0)
+  const [currentZoom, setCurrentZoom] = useState(1)
   const [showAssetPicker, setShowAssetPicker] = useState(false)
   const [showStickerPicker, setShowStickerPicker] = useState(false)
   const [showBackgroundModal, setShowBackgroundModal] = useState(false)
@@ -258,8 +259,14 @@ export default function CoverEditorPage() {
       <div className="flex flex-1 min-h-0">
         {/* Page area */}
         <div className="flex-1 overflow-auto p-6 bg-neutral-100">
-          <div className="mx-auto" style={{ width: PAGE_WIDTH }}>
-            <div className="relative shadow-lg" style={{ width: PAGE_WIDTH, height: PAGE_HEIGHT }}>
+          <div
+            className="mx-auto"
+            style={{ width: PAGE_WIDTH * currentZoom, height: PAGE_HEIGHT * currentZoom }}
+          >
+            <div
+              className="relative shadow-lg origin-top-left"
+              style={{ width: PAGE_WIDTH, height: PAGE_HEIGHT, transform: `scale(${currentZoom})` }}
+            >
               <CanvasEditor
                 ref={canvasEditorRef}
                 width={PAGE_WIDTH}
@@ -267,6 +274,7 @@ export default function CoverEditorPage() {
                 onModified={handleCanvasModified}
                 onSelectionChange={handleSelectionChange}
                 onReady={handleCanvasReady}
+                onZoomChange={setCurrentZoom}
               />
             </div>
           </div>

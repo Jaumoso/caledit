@@ -49,6 +49,7 @@ export default function MonthEditorPage() {
   const [showBackgroundModal, setShowBackgroundModal] = useState(false)
   const [bgAssetMode, setBgAssetMode] = useState(false)
   const [showSaveTemplate, setShowSaveTemplate] = useState(false)
+  const [currentZoom, setCurrentZoom] = useState(1)
 
   const dirtyRef = useRef(false)
   const gridConfigRef = useRef(gridConfig)
@@ -413,9 +414,15 @@ export default function MonthEditorPage() {
       <div className="flex flex-1 min-h-0">
         {/* Page area */}
         <div className="flex-1 overflow-auto p-6 bg-neutral-100">
-          <div className="mx-auto" style={{ width: PAGE_WIDTH }}>
+          <div
+            className="mx-auto"
+            style={{ width: PAGE_WIDTH * currentZoom, height: PAGE_HEIGHT * currentZoom }}
+          >
             {/* Unified A4 page container */}
-            <div className="relative shadow-lg" style={{ width: PAGE_WIDTH, height: PAGE_HEIGHT }}>
+            <div
+              className="relative shadow-lg origin-top-left"
+              style={{ width: PAGE_WIDTH, height: PAGE_HEIGHT, transform: `scale(${currentZoom})` }}
+            >
               {/* Fabric.js canvas — full page background + art objects */}
               <div
                 className={`absolute inset-0 ${editorMode === 'canvas' ? '' : 'pointer-events-none'}`}
@@ -428,6 +435,7 @@ export default function MonthEditorPage() {
                   onModified={handleCanvasModified}
                   onSelectionChange={handleSelectionChange}
                   onReady={handleCanvasReady}
+                  onZoomChange={setCurrentZoom}
                 />
               </div>
 
