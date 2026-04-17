@@ -303,7 +303,9 @@ export default function LibraryPage() {
                   className="group bg-surface border border-neutral-200 rounded-lg p-3 hover:shadow-sm transition-shadow cursor-pointer relative"
                   onClick={() => setCurrentFolderId(folder.id)}
                 >
-                  <div className="text-2xl mb-1"><Folder size={20} /></div>
+                  <div className="text-2xl mb-1">
+                    <Folder size={20} />
+                  </div>
                   <p className="text-sm font-medium text-neutral-800 truncate">{folder.name}</p>
                   <p className="text-xs text-neutral-400">
                     {folder._count.assets === 1

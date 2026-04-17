@@ -148,7 +148,8 @@ export default function TemplatesPage() {
                         <h3 className="font-medium text-neutral-900 text-sm">{tpl.name}</h3>
                         {tpl.isDefault && (
                           <span className="text-[10px] bg-primary-100 text-primary-700 px-1.5 py-0.5 rounded-full font-medium">
-                            <Star size={14} className="inline mr-1" />{t('templates.default')}
+                            <Star size={14} className="inline mr-1" />
+                            {t('templates.default')}
                           </span>
                         )}
                       </div>

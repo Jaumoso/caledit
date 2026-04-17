@@ -91,7 +91,9 @@ export default function LayersPanel({ editorRef, selectedObject, refreshKey }: L
               ${isActive ? 'bg-primary-100 text-primary-800' : 'hover:bg-neutral-100 text-neutral-700'}
               ${isDragOver ? 'border-t-2 border-primary-400' : 'border-t-2 border-transparent'}`}
           >
-            <span className="text-neutral-300 cursor-grab select-none"><GripVertical size={14} className="text-neutral-300" /></span>
+            <span className="text-neutral-300 cursor-grab select-none">
+              <GripVertical size={14} className="text-neutral-300" />
+            </span>
             <span className="text-sm flex items-center">{getObjectIcon(obj)}</span>
             <span className="truncate flex-1">{name}</span>
             <button
@@ -131,7 +133,8 @@ function getObjectName(
 }
 
 function getObjectIcon(obj: fabric.FabricObject): React.ReactNode {
-  if (obj.type === 'i-text' || obj.type === 'text' || obj.type === 'textbox') return <Type size={14} />
+  if (obj.type === 'i-text' || obj.type === 'text' || obj.type === 'textbox')
+    return <Type size={14} />
   if (obj.type === 'image') return <Image size={14} />
   if (obj.type === 'rect') return <Square size={14} />
   if (obj.type === 'circle') return <Circle size={14} />

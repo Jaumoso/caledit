@@ -2,6 +2,105 @@ import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { X } from 'lucide-react'
 
+const EMOJI_KEYWORDS: Record<string, string[]> = {
+  '❤️': ['heart', 'love', 'corazón', 'amor'],
+  '⭐': ['star', 'estrella'],
+  '🎉': ['party', 'celebrate', 'fiesta', 'celebrar'],
+  '🎂': ['cake', 'birthday', 'tarta', 'cumpleaños'],
+  '🎁': ['gift', 'present', 'regalo'],
+  '🌸': ['flower', 'blossom', 'flor', 'cerezo'],
+  '☀️': ['sun', 'sol'],
+  '🌙': ['moon', 'luna'],
+  '❄️': ['snow', 'cold', 'nieve', 'frío'],
+  '🔥': ['fire', 'hot', 'fuego'],
+  '💫': ['sparkle', 'dizzy', 'brillo', 'estrella'],
+  '🎵': ['music', 'note', 'música', 'nota'],
+  '📌': ['pin', 'pushpin', 'chincheta'],
+  '✨': ['sparkles', 'shine', 'destellos', 'brillo'],
+  '💕': ['hearts', 'love', 'corazones', 'amor'],
+  '🎀': ['ribbon', 'bow', 'lazo', 'cinta'],
+  '😀': ['smile', 'happy', 'sonrisa', 'feliz'],
+  '😊': ['blush', 'smile', 'sonrisa', 'rubor'],
+  '😍': ['love', 'heart eyes', 'enamorado', 'ojos corazón'],
+  '🥰': ['love', 'hearts', 'cariño', 'amor'],
+  '😎': ['cool', 'sunglasses', 'genial', 'gafas'],
+  '🤩': ['star eyes', 'excited', 'emocionado', 'estrellas'],
+  '😇': ['angel', 'halo', 'ángel'],
+  '🥳': ['party', 'celebrate', 'fiesta', 'celebrar'],
+  '😘': ['kiss', 'beso'],
+  '☺️': ['smile', 'happy', 'sonrisa'],
+  '🤗': ['hug', 'abrazo'],
+  '😄': ['grin', 'happy', 'feliz', 'sonrisa'],
+  '🐶': ['dog', 'puppy', 'perro', 'cachorro'],
+  '🐱': ['cat', 'kitten', 'gato', 'gatito'],
+  '🐰': ['rabbit', 'bunny', 'conejo'],
+  '🦊': ['fox', 'zorro'],
+  '🐻': ['bear', 'oso'],
+  '🐼': ['panda'],
+  '🐨': ['koala'],
+  '🐯': ['tiger', 'tigre'],
+  '🦁': ['lion', 'león'],
+  '🐮': ['cow', 'vaca'],
+  '🐷': ['pig', 'cerdo'],
+  '🐸': ['frog', 'rana'],
+  '🌺': ['hibiscus', 'flower', 'flor'],
+  '🌻': ['sunflower', 'girasol'],
+  '🌷': ['tulip', 'tulipán'],
+  '🌹': ['rose', 'rosa'],
+  '🌼': ['flower', 'blossom', 'flor'],
+  '🍀': ['clover', 'luck', 'trébol', 'suerte'],
+  '🌿': ['herb', 'plant', 'planta', 'hierba'],
+  '🍂': ['leaf', 'autumn', 'hoja', 'otoño'],
+  '🍁': ['maple', 'leaf', 'arce', 'hoja'],
+  '🌴': ['palm', 'tree', 'palmera'],
+  '🌳': ['tree', 'árbol'],
+  '🌵': ['cactus'],
+  '🍎': ['apple', 'manzana'],
+  '🍕': ['pizza'],
+  '🍰': ['cake', 'tarta', 'pastel'],
+  '☕': ['coffee', 'café'],
+  '🍷': ['wine', 'vino'],
+  '🍓': ['strawberry', 'fresa'],
+  '🍒': ['cherry', 'cereza'],
+  '🍑': ['peach', 'melocotón'],
+  '🥂': ['toast', 'champagne', 'brindis'],
+  '🧁': ['cupcake', 'magdalena'],
+  '🍫': ['chocolate'],
+  '🎈': ['balloon', 'globo'],
+  '🎊': ['confetti', 'confeti'],
+  '🏆': ['trophy', 'trofeo', 'premio'],
+  '🎯': ['target', 'dart', 'diana', 'objetivo'],
+  '📸': ['camera', 'photo', 'cámara', 'foto'],
+  '🎨': ['art', 'paint', 'arte', 'pintura', 'paleta'],
+  '✏️': ['pencil', 'write', 'lápiz', 'escribir'],
+  '📅': ['calendar', 'date', 'calendario', 'fecha'],
+  '🔔': ['bell', 'notification', 'campana'],
+  '💌': ['letter', 'love', 'carta', 'amor'],
+  '✈️': ['plane', 'travel', 'avión', 'viajar'],
+  '🚗': ['car', 'coche', 'auto'],
+  '⛵': ['boat', 'sail', 'barco', 'velero'],
+  '🏖️': ['beach', 'playa'],
+  '🗼': ['tower', 'torre'],
+  '🏰': ['castle', 'castillo'],
+  '⛰️': ['mountain', 'montaña'],
+  '🌍': ['earth', 'world', 'tierra', 'mundo'],
+  '🗺️': ['map', 'mapa'],
+  '🧳': ['luggage', 'suitcase', 'maleta', 'equipaje'],
+  '🏕️': ['camping', 'tent', 'tienda', 'acampar'],
+  '🎢': ['roller coaster', 'montaña rusa'],
+  '💛': ['yellow heart', 'corazón amarillo'],
+  '💚': ['green heart', 'corazón verde'],
+  '💙': ['blue heart', 'corazón azul'],
+  '💜': ['purple heart', 'corazón morado'],
+  '🤍': ['white heart', 'corazón blanco'],
+  '🖤': ['black heart', 'corazón negro'],
+  '🤎': ['brown heart', 'corazón marrón'],
+  '💗': ['growing heart', 'corazón'],
+  '💝': ['heart ribbon', 'corazón lazo'],
+  '♻️': ['recycle', 'reciclar'],
+  '☮️': ['peace', 'paz'],
+}
+
 const EMOJI_CATEGORIES: { name: string; emojis: string[] }[] = [
   {
     name: 'stickerPicker.favorites',
@@ -68,7 +167,15 @@ export default function StickerPickerModal({ isOpen, onClose, onSelect }: Sticke
   if (!isOpen) return null
 
   const filteredEmojis = search
-    ? EMOJI_CATEGORIES.flatMap((c) => c.emojis)
+    ? (() => {
+        const q = search.toLowerCase()
+        const all = EMOJI_CATEGORIES.flatMap((c) => c.emojis)
+        const unique = [...new Set(all)]
+        return unique.filter((emoji) => {
+          const keywords = EMOJI_KEYWORDS[emoji]
+          return keywords?.some((kw) => kw.includes(q))
+        })
+      })()
     : EMOJI_CATEGORIES[activeCategory].emojis
 
   return (

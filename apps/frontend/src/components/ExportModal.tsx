@@ -1,6 +1,15 @@
 import { useState, useEffect, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
-import { FileDown, FileText, Image, Loader2, RefreshCw, CheckCircle2, Download, XCircle } from 'lucide-react'
+import {
+  FileDown,
+  FileText,
+  Image,
+  Loader2,
+  RefreshCw,
+  CheckCircle2,
+  Download,
+  XCircle,
+} from 'lucide-react'
 import api from '../lib/api'
 
 interface ExportJob {
@@ -104,7 +113,10 @@ export default function ExportModal({ projectId, projectName, projectYear, onClo
       <div className="bg-surface rounded-xl shadow-xl w-full max-w-md mx-4 overflow-hidden">
         {/* Header */}
         <div className="flex items-center justify-between px-5 py-4 border-b border-neutral-200">
-          <h2 className="text-lg font-bold text-neutral-900"><FileDown size={18} className="inline mr-2" />{t('exportModal.title')}</h2>
+          <h2 className="text-lg font-bold text-neutral-900">
+            <FileDown size={18} className="inline mr-2" />
+            {t('exportModal.title')}
+          </h2>
           <button
             onClick={onClose}
             disabled={!!isRunning}
@@ -132,7 +144,8 @@ export default function ExportModal({ projectId, projectName, projectYear, onClo
                         : 'border-neutral-200 text-neutral-600 hover:border-neutral-300'
                     }`}
                   >
-                    <FileText size={16} className="inline mr-1" />{t('exportModal.pdfLabel')}
+                    <FileText size={16} className="inline mr-1" />
+                    {t('exportModal.pdfLabel')}
                     <br />
                     <span className="text-xs font-normal opacity-70">
                       {t('exportModal.pdfDesc')}
@@ -146,7 +159,8 @@ export default function ExportModal({ projectId, projectName, projectYear, onClo
                         : 'border-neutral-200 text-neutral-600 hover:border-neutral-300'
                     }`}
                   >
-                    <Image size={16} className="inline mr-1" />{t('exportModal.pngLabel')}
+                    <Image size={16} className="inline mr-1" />
+                    {t('exportModal.pngLabel')}
                     <br />
                     <span className="text-xs font-normal opacity-70">
                       {t('exportModal.pngDesc')}
@@ -236,12 +250,16 @@ export default function ExportModal({ projectId, projectName, projectYear, onClo
               {/* Status */}
               <div className="text-center">
                 {job.status === 'PENDING' && (
-                  <p className="text-neutral-600"><Loader2 size={16} className="animate-spin inline mr-1" />{t('exportModal.preparing')}</p>
+                  <p className="text-neutral-600">
+                    <Loader2 size={16} className="animate-spin inline mr-1" />
+                    {t('exportModal.preparing')}
+                  </p>
                 )}
                 {job.status === 'PROCESSING' && (
                   <>
                     <p className="text-neutral-600 mb-2">
-                      <RefreshCw size={16} className="animate-spin inline mr-1" />{t('exportModal.rendering', {
+                      <RefreshCw size={16} className="animate-spin inline mr-1" />
+                      {t('exportModal.rendering', {
                         current: job.currentPage,
                         total: job.totalPages,
                       })}
@@ -257,14 +275,18 @@ export default function ExportModal({ projectId, projectName, projectYear, onClo
                 )}
                 {job.status === 'COMPLETED' && (
                   <div className="space-y-3">
-                    <p className="text-green-600 font-medium"><CheckCircle2 size={16} className="inline mr-1 text-green-600" />{t('exportModal.completed')}</p>
+                    <p className="text-green-600 font-medium">
+                      <CheckCircle2 size={16} className="inline mr-1 text-green-600" />
+                      {t('exportModal.completed')}
+                    </p>
                     {!!job.fileSize && (
                       <p className="text-xs text-neutral-400">
                         Size: {formatFileSize(job.fileSize)}
                       </p>
                     )}
                     <button onClick={handleDownload} className="btn btn-primary w-full">
-                      <Download size={16} className="inline mr-1" />{job.format === 'PDF'
+                      <Download size={16} className="inline mr-1" />
+                      {job.format === 'PDF'
                         ? t('exportModal.downloadPdf')
                         : t('exportModal.downloadZip')}
                     </button>
@@ -272,7 +294,10 @@ export default function ExportModal({ projectId, projectName, projectYear, onClo
                 )}
                 {job.status === 'FAILED' && (
                   <div className="space-y-2">
-                    <p className="text-red-600 font-medium"><XCircle size={16} className="inline mr-1 text-red-600" />{t('exportModal.exportError')}</p>
+                    <p className="text-red-600 font-medium">
+                      <XCircle size={16} className="inline mr-1 text-red-600" />
+                      {t('exportModal.exportError')}
+                    </p>
                     <p className="text-xs text-red-500">{job.error}</p>
                     <button onClick={() => setJob(null)} className="btn btn-secondary text-sm">
                       {t('common.retry')}

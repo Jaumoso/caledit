@@ -52,7 +52,13 @@ export default function AppLayout() {
             </div>
             <div className="flex items-center gap-4">
               <div className="flex items-center border border-neutral-200 rounded overflow-hidden">
-                {([['light', Sun], ['dark', Moon], ['system', Monitor]] as const).map(([value, Icon]) => (
+                {(
+                  [
+                    ['light', Sun],
+                    ['dark', Moon],
+                    ['system', Monitor],
+                  ] as const
+                ).map(([value, Icon]) => (
                   <button
                     key={value}
                     onClick={() => setTheme(value)}

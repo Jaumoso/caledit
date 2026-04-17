@@ -112,7 +112,8 @@ export default function AssetPickerModal({
                 onClick={() => setCurrentFolder(f.id)}
                 className="px-3 py-1 text-xs bg-neutral-100 hover:bg-neutral-200 rounded-full text-neutral-700 transition-colors"
               >
-                <Folder size={14} className="inline mr-1" />{f.name}
+                <Folder size={14} className="inline mr-1" />
+                {f.name}
               </button>
             ))}
           </div>

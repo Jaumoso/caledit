@@ -1,5 +1,21 @@
 import { useTranslation } from 'react-i18next'
-import { MousePointer2, ImagePlus, Type, Smile, Paintbrush, ChevronsUp, ChevronUp, ChevronDown, ChevronsDown, Undo2, Redo2, ZoomOut, ZoomIn, Scan, Trash2 } from 'lucide-react'
+import {
+  MousePointer2,
+  ImagePlus,
+  Type,
+  Smile,
+  Paintbrush,
+  ChevronsUp,
+  ChevronUp,
+  ChevronDown,
+  ChevronsDown,
+  Undo2,
+  Redo2,
+  ZoomOut,
+  ZoomIn,
+  Scan,
+  Trash2,
+} from 'lucide-react'
 import type { CanvasEditorHandle } from './CanvasEditor'
 
 interface CanvasToolbarProps {
@@ -21,23 +37,40 @@ export default function CanvasToolbar({
   return (
     <div className="flex items-center gap-1 bg-surface rounded-lg border border-neutral-200 px-2 py-1.5 shadow-sm flex-wrap">
       {/* Selection / Move (default) */}
-      <ToolButton title={t('toolbar.selectMove')} icon={<MousePointer2 size={16} />} onClick={() => {}} active />
+      <ToolButton
+        title={t('toolbar.selectMove')}
+        icon={<MousePointer2 size={16} />}
+        onClick={() => {}}
+        active
+      />
 
       <Separator />
 
       {/* Add elements */}
-      <ToolButton title={t('toolbar.addImage')} icon={<ImagePlus size={16} />} onClick={onAddImage} />
+      <ToolButton
+        title={t('toolbar.addImage')}
+        icon={<ImagePlus size={16} />}
+        onClick={onAddImage}
+      />
       <ToolButton
         title={t('toolbar.addText')}
         icon={<Type size={16} />}
         onClick={() => editor?.addText()}
       />
-      <ToolButton title={t('toolbar.addSticker')} icon={<Smile size={16} />} onClick={onAddSticker} />
+      <ToolButton
+        title={t('toolbar.addSticker')}
+        icon={<Smile size={16} />}
+        onClick={onAddSticker}
+      />
 
       <Separator />
 
       {/* Background */}
-      <ToolButton title={t('toolbar.background')} icon={<Paintbrush size={16} />} onClick={onBackgroundSettings} />
+      <ToolButton
+        title={t('toolbar.background')}
+        icon={<Paintbrush size={16} />}
+        onClick={onBackgroundSettings}
+      />
 
       <Separator />
 
@@ -57,7 +90,11 @@ export default function CanvasToolbar({
         icon={<ChevronDown size={16} />}
         onClick={() => editor?.sendBackward()}
       />
-      <ToolButton title={t('toolbar.sendToBack')} icon={<ChevronsDown size={16} />} onClick={() => editor?.sendToBack()} />
+      <ToolButton
+        title={t('toolbar.sendToBack')}
+        icon={<ChevronsDown size={16} />}
+        onClick={() => editor?.sendToBack()}
+      />
 
       <Separator />
 
@@ -78,12 +115,24 @@ export default function CanvasToolbar({
       <Separator />
 
       {/* Zoom */}
-      <ToolButton title={t('toolbar.zoomOut')} icon={<ZoomOut size={16} />} onClick={() => editor?.zoomOut()} />
+      <ToolButton
+        title={t('toolbar.zoomOut')}
+        icon={<ZoomOut size={16} />}
+        onClick={() => editor?.zoomOut()}
+      />
       <span className="text-xs text-neutral-500 min-w-[3rem] text-center select-none">
         {Math.round((editor?.zoom ?? 1) * 100)}%
       </span>
-      <ToolButton title={t('toolbar.zoomIn')} icon={<ZoomIn size={16} />} onClick={() => editor?.zoomIn()} />
-      <ToolButton title={t('toolbar.zoomReset')} icon={<Scan size={16} />} onClick={() => editor?.zoomReset()} />
+      <ToolButton
+        title={t('toolbar.zoomIn')}
+        icon={<ZoomIn size={16} />}
+        onClick={() => editor?.zoomIn()}
+      />
+      <ToolButton
+        title={t('toolbar.zoomReset')}
+        icon={<Scan size={16} />}
+        onClick={() => editor?.zoomReset()}
+      />
 
       <Separator />
 

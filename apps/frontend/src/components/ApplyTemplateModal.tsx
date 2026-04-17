@@ -74,7 +74,8 @@ export default function ApplyTemplateModal({ projectId, onClose, onApplied }: Pr
       <div className="absolute inset-0 bg-black/40" onClick={onClose} />
       <div className="relative bg-surface rounded-lg shadow-xl w-full max-w-md mx-4 p-5">
         <h2 className="text-base font-semibold text-neutral-900 mb-1">
-          <ClipboardList size={18} className="inline mr-2" />{t('applyTemplate.title')}
+          <ClipboardList size={18} className="inline mr-2" />
+          {t('applyTemplate.title')}
         </h2>
         <p className="text-xs text-neutral-500 mb-4">{t('applyTemplate.description')}</p>
 
@@ -91,7 +92,9 @@ export default function ApplyTemplateModal({ projectId, onClose, onApplied }: Pr
           <>
             {result ? (
               <div className="py-6 text-center">
-                <div className="text-3xl mb-2"><CheckCircle2 size={32} className="text-green-600 mx-auto" /></div>
+                <div className="text-3xl mb-2">
+                  <CheckCircle2 size={32} className="text-green-600 mx-auto" />
+                </div>
                 <p className="text-sm text-neutral-700">
                   {t('applyTemplate.applied', { applied: result.appliedTo, total: result.total })}
                 </p>

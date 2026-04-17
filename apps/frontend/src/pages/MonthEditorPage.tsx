@@ -320,7 +320,8 @@ export default function MonthEditorPage() {
             className="btn btn-secondary text-sm"
             title={t('editor.saveTemplate')}
           >
-            <Save size={14} className="inline mr-1" />{t('editor.templateButton')}
+            <Save size={14} className="inline mr-1" />
+            {t('editor.templateButton')}
           </button>
         </div>
       </div>
@@ -335,7 +336,8 @@ export default function MonthEditorPage() {
               : 'bg-neutral-100 text-neutral-600 hover:bg-neutral-200'
           }`}
         >
-          <Paintbrush size={14} className="inline mr-1" />{t('editor.decoratePage')}
+          <Paintbrush size={14} className="inline mr-1" />
+          {t('editor.decoratePage')}
         </button>
         <button
           onClick={() => setEditorMode('grid')}
@@ -345,7 +347,8 @@ export default function MonthEditorPage() {
               : 'bg-neutral-100 text-neutral-600 hover:bg-neutral-200'
           }`}
         >
-          <Grid3X3 size={14} className="inline mr-1" />{t('editor.editGrid')}
+          <Grid3X3 size={14} className="inline mr-1" />
+          {t('editor.editGrid')}
         </button>
 
         {editorMode === 'canvas' && (

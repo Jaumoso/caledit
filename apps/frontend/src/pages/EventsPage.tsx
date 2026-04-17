@@ -64,7 +64,8 @@ export default function EventsPage() {
     {} as Record<number, CalEvent[]>
   )
 
-  const typeIcon = (type: string) => EVENT_TYPES.find((t) => t.value === type)?.icon || <Pin size={16} />
+  const typeIcon = (type: string) =>
+    EVENT_TYPES.find((t) => t.value === type)?.icon || <Pin size={16} />
 
   return (
     <div className="max-w-4xl mx-auto px-4 py-6">
