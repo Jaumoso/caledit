@@ -1,5 +1,6 @@
 {
   "name": "kalenda",
+  "version": "0.1.0",
   "private": true,
   "type": "module",
   "packageManager": "pnpm@8.15.0",
@@ -12,7 +13,8 @@
     "test": "pnpm -r test",
     "test:watch": "pnpm -r test:watch",
     "clean": "pnpm -r clean",
-    "install:all": "pnpm install"
+    "install:all": "pnpm install",
+    "bump": "./scripts/bump.sh"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
