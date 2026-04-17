@@ -302,6 +302,10 @@
     "weekend": "Weekend",
     "bgColor": "Background color",
     "headerWeekdays": "Header (weekdays)",
+    "headerFormat": "Day name format",
+    "headerFormatShort": "Short (M)",
+    "headerFormatMedium": "Medium (Mon)",
+    "headerFormatLong": "Long (Monday)",
     "textColor": "Text color",
     "headerBgColor": "Background color",
     "holidaysEvents": "Holidays & events",
@@ -422,13 +426,33 @@
     "next": "Next"
   },
   "weekDays": {
-    "monday": "Monday",
-    "tuesday": "Tuesday",
-    "wednesday": "Wednesday",
-    "thursday": "Thursday",
-    "friday": "Friday",
-    "saturday": "Saturday",
-    "sunday": "Sunday"
+    "short": {
+      "monday": "M",
+      "tuesday": "T",
+      "wednesday": "W",
+      "thursday": "T",
+      "friday": "F",
+      "saturday": "S",
+      "sunday": "S"
+    },
+    "medium": {
+      "monday": "Mon",
+      "tuesday": "Tue",
+      "wednesday": "Wed",
+      "thursday": "Thu",
+      "friday": "Fri",
+      "saturday": "Sat",
+      "sunday": "Sun"
+    },
+    "long": {
+      "monday": "Monday",
+      "tuesday": "Tuesday",
+      "wednesday": "Wednesday",
+      "thursday": "Thursday",
+      "friday": "Friday",
+      "saturday": "Saturday",
+      "sunday": "Sunday"
+    }
   },
   "theme": {
     "light": "Light",

@@ -11,8 +11,7 @@ import {
   getDaysInMonth,
   getFirstDayOfWeek,
   isWeekend,
-  WEEKDAY_HEADERS_MON,
-  WEEKDAY_HEADERS_SUN,
+  getWeekdayHeaders,
 } from '../lib/calendarTypes'
 
 interface Props {
@@ -53,7 +52,7 @@ export default function CalendarGrid({
   const config = { ...DEFAULT_GRID_CONFIG, ...gridConfig }
   const daysInMonth = getDaysInMonth(year, month)
   const firstDay = getFirstDayOfWeek(year, month, weekStartsOn)
-  const weekdays = weekStartsOn === 'monday' ? WEEKDAY_HEADERS_MON : WEEKDAY_HEADERS_SUN
+  const weekdays = getWeekdayHeaders(weekStartsOn, config.headerFormat)
   const cellMap = new Map(dayCells.map((c) => [c.dayNumber, c]))
   const holidayMap = new Map<number, Holiday[]>()
   const eventMap = new Map<number, CalEvent[]>()

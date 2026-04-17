@@ -231,6 +231,18 @@ export default function GridPropertiesPanel({ config, onChange }: Props) {
       {/* Header */}
       <section>
         <h4 className="text-xs font-medium text-neutral-600 mb-2">{t('grid.headerWeekdays')}</h4>
+        <div className="mb-2">
+          <label className="text-xs text-neutral-500 block mb-1">{t('grid.headerFormat')}</label>
+          <select
+            value={config.headerFormat}
+            onChange={(e) => update('headerFormat', e.target.value as GridConfig['headerFormat'])}
+            className="w-full text-xs border border-neutral-300 rounded px-2 py-1 outline-none focus:ring-1 focus:ring-primary-500"
+          >
+            <option value="short">{t('grid.headerFormatShort')}</option>
+            <option value="medium">{t('grid.headerFormatMedium')}</option>
+            <option value="long">{t('grid.headerFormatLong')}</option>
+          </select>
+        </div>
         <FontSelector
           label={t('grid.font')}
           value={config.headerFontFamily}

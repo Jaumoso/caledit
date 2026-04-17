@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Building2, CalendarDays, Image, X, Smile, Palette, Cake, Heart, Pin } from 'lucide-react'
 import type { DayCell, Holiday, CalEvent } from '../lib/calendarTypes'
-import { MONTH_NAMES } from '../lib/calendarTypes'
+import { getMonthNames } from '../lib/calendarTypes'
 import ColorPicker from './ColorPicker'
 import AssetPickerModal from './AssetPickerModal'
 import StickerPickerModal from './StickerPickerModal'
@@ -135,7 +135,7 @@ export default function CellModal({
         onClick={(e) => e.stopPropagation()}
       >
         <h2 className="text-lg font-semibold text-neutral-900 mb-1">
-          {t('cell.dayTitle', { day: dayNumber, month: MONTH_NAMES[month - 1], year })}
+          {t('cell.dayTitle', { day: dayNumber, month: getMonthNames()[month - 1], year })}
         </h2>
         {saint && <p className="text-xs text-neutral-400 mb-1">{saint}</p>}
         <hr className="my-3 border-neutral-200" />

@@ -21,6 +21,7 @@ export interface GridConfig {
   headerFontSize: number
   headerFontColor: string
   headerBgColor: string
+  headerFormat: 'short' | 'medium' | 'long'
   showHolidays: boolean
   holidayBgColor: string
   showSaints: boolean
@@ -134,26 +135,16 @@ export const DEFAULT_GRID_CONFIG: GridConfig = {
   headerFontSize: 12,
   headerFontColor: '#6B6560',
   headerBgColor: '#F8F7F4',
+  headerFormat: 'short',
   showHolidays: true,
   holidayBgColor: '#FECACA',
   showSaints: false,
   showEvents: true,
 }
 
-export const MONTH_NAMES = [
-  'Enero',
-  'Febrero',
-  'Marzo',
-  'Abril',
-  'Mayo',
-  'Junio',
-  'Julio',
-  'Agosto',
-  'Septiembre',
-  'Octubre',
-  'Noviembre',
-  'Diciembre',
-]
+export function getMonthNames(): string[] {
+  return t('months', { returnObjects: true }) as string[]
+}
 
 export function getDaysInMonth(year: number, month: number): number {
   return new Date(year, month, 0).getDate()
@@ -173,21 +164,12 @@ export function isWeekend(dayNumber: number, year: number, month: number): boole
   return dow === 0 || dow === 6
 }
 
-export const WEEKDAY_HEADERS_MON = [
-  t('weekDays.monday'),
-  t('weekDays.tuesday'),
-  t('weekDays.wednesday'),
-  t('weekDays.thursday'),
-  t('weekDays.friday'),
-  t('weekDays.saturday'),
-  t('weekDays.sunday'),
-]
-export const WEEKDAY_HEADERS_SUN = [
-  t('weekDays.sunday'),
-  t('weekDays.monday'),
-  t('weekDays.tuesday'),
-  t('weekDays.wednesday'),
-  t('weekDays.thursday'),
-  t('weekDays.friday'),
-  t('weekDays.saturday'),
-]
+export type WeekdayFormat = 'short' | 'medium' | 'long'
+
+const DAYS_MON = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday']
+const DAYS_SUN = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday']
+
+export function getWeekdayHeaders(weekStartsOn: string, format: WeekdayFormat = 'short'): string[] {
+  const days = weekStartsOn === 'monday' ? DAYS_MON : DAYS_SUN
+  return days.map((d) => t(`weekDays.${format}.${d}`))
+}
